@@ -14,6 +14,10 @@ nml_mat* nml_allocate_mat(unsigned int num_rows, unsigned int num_cols) {
   return mat;
 }
 
+nml_mat* nml_mat_sqr(unsigned int size) {
+  return nml_allocate_mat(size, size);
+}
+
 void nml_free_mat(nml_mat *mat) {
   free(mat->data); 
   free(mat);

@@ -24,7 +24,20 @@ int main() {
   
   // Free memory 
   nml_free_mat(mat);
-  
+
+  nml_mat* mat2 = nml_mat_sqr(4);
+  for (int i = 0; i < (int)(mat2->num_rows); i++) {
+    for (int j = 0; j < (int)(mat2->num_cols); j++) {
+      mat2->data[i * mat2->num_cols + j] = (double)(i + j + 1);  
+    }
+  }
+
+  // Print the matrix to verify
+  nml_mat_print(mat2);
+
+  // Free the matrix memory
+  nml_free_mat(mat2);  
+
   return 0;
 
 }

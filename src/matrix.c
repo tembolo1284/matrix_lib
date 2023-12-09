@@ -28,8 +28,8 @@ void nml_mat_printf(nml_mat *matrix, const char *d_fmt) {
   int i, j;
   fprintf(stdout, "\n");
   
-  for(i = 0; i < matrix->num_rows; ++i) {
-    for(j = 0; j < matrix->num_cols; ++j) {
+  for(i = 0; i <(int)(matrix->num_rows); ++i) {
+    for(j = 0; j < (int)(matrix->num_cols); ++j) {
       fprintf(stdout, d_fmt, 
         matrix->data[i*matrix->num_cols + j]); 
     }

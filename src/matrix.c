@@ -18,6 +18,21 @@ nml_mat* nml_mat_sqr(unsigned int size) {
   return nml_allocate_mat(size, size);
 }
 
+nml_mat* nml_mat_eye(unsigned int size) {
+  nml_mat* r = nml_allocate_mat(size, size);
+  
+  for (int i = 0; i < (int)(r->num_rows*r->num_cols); i++) {
+    r->data[i] = 0.0;
+  }
+ 
+  for (int i = 0; i < (int)(r->num_rows); i++) {
+    r->data[i * r->num_cols + i] = 1.0;
+  }
+
+  return r;
+
+}
+
 void nml_free_mat(nml_mat *mat) {
   free(mat->data); 
   free(mat);

@@ -11,6 +11,7 @@ typedef struct nml_mat_s {
 nml_mat* nml_allocate_mat(unsigned int num_rows, unsigned int num_cols);
 
 nml_mat* nml_mat_sqr(unsigned int size);
+nml_mat* nml_mat_eye(unsigned int size);
 
 void nml_free_mat(nml_mat *mat);
 

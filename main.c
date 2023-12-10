@@ -38,6 +38,10 @@ int main() {
   // Free the matrix memory
   nml_free_mat(mat2);  
 
+  nml_mat* mat3 = nml_mat_eye(6);
+  nml_mat_print(mat3);
+  nml_free_mat(mat3);
+
   return 0;
 
 }

@@ -10,9 +10,13 @@ typedef struct matrix_s {
   bool is_square;
 } matrix;
 
-typedef void (*print_func)(const void *);
+matrix *matrix_new(unsigned int num_rows, unsigned int num_cols, size_t element_size);
 
-matrix *matrix_allocate(unsigned int num_rows, unsigned int num_cols, size_t element_size);
+matrix *matrix_rand(unsigned int num_rows, 
+                    unsigned int num_cols, 
+                    double min, 
+                    double max, 
+                    size_t element_size);
 
 matrix *matrix_sqr(unsigned int size, size_t element_size);
 matrix *matrix_eye(unsigned int size, size_t element_size, const void *identity_element);

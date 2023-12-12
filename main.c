@@ -4,7 +4,7 @@
 
 int main() {
     // Allocate 2x3 double matrix
-    matrix *mat = matrix_allocate(2, 3, sizeof(double));
+    matrix *mat = matrix_new(2, 3, sizeof(double));
     if (!mat) return 1;
 
     // Initialize values for double matrix
@@ -17,17 +17,26 @@ int main() {
     data_double[5] = 6.0;
 
     // Print the double matrix
+    printf("First matrix of doubles 2x3 from 1.0 to 6.0\n");
     matrix_print(mat);
 
     // Free memory
     matrix_free(mat);
 
+    matrix *mat1 = matrix_rand(3, 4, 0.0, 10.0, sizeof(double));
+    printf("Second matrix of random doubles 3x4 with values from 0.0-10.0\n");
+    matrix_print(mat1);
+
     // Allocate 4x4 int square matrix
-    matrix *mat2 = matrix_sqr(4, sizeof(int));
+    matrix *mat2 = matrix_sqr(4, sizeof(double));
     if (!mat2) return 1;
 
+    // Confirm we have an initial matrix of all zeroes
+    printf("Check our 4x4 square matrix is initialized with all zeroes\n");
+    matrix_print(mat2);
+
     // Initialize values for int matrix
-    int *data_int = (int *)mat2->data;
+    double *data_int = (double *)mat2->data;
     for (int i = 0; i < (int)(mat2->num_rows); i++) {
         for (int j = 0; j < (int)(mat2->num_cols); j++) {
             data_int[i * mat2->num_cols + j] = i + j + 1;
@@ -35,6 +44,7 @@ int main() {
     }
 
     // Print the int matrix
+    printf("Confirm the square matrix is now from 1.0 to 16.0\n");
     matrix_print(mat2);
 
     // Free the matrix memory
@@ -45,6 +55,7 @@ int main() {
     matrix *mat3 = matrix_eye(6, sizeof(double), &identity_double);
     if (!mat3) return 1;
 
+    printf("Confirm we have a proper 6x6 identity matrix\n");
     // Print the double identity matrix
     matrix_print(mat3);
 

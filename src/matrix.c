@@ -3,7 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-matrix *matrix_allocate(unsigned int num_rows, unsigned int num_cols, size_t element_size) {
+double matrix_rand_interval(double min, double max) {
+    double d = (double) rand() / ((double) RAND_MAX + 1);
+    return min + d * (max - min);
+}
+
+
+matrix *matrix_new(unsigned int num_rows, unsigned int num_cols, size_t element_size) {
 
   matrix *mat = malloc(sizeof(matrix));
   if (!mat) {
@@ -19,12 +25,38 @@ matrix *matrix_allocate(unsigned int num_rows, unsigned int num_cols, size_t ele
   return mat;
 }
 
+matrix *matrix_rand(unsigned int num_rows, 
+                    unsigned int num_cols, 
+                    double min, double max, 
+                    size_t element_size) {
+
+    matrix *r = matrix_new(num_rows, num_cols, element_size); // Allocate new matrix
+    if (!r) {
+      return NULL;
+    }
+
+    double *data = (double *)r->data; // Cast to double* for direct access
+    for (int i = 0; i < (int)num_rows; i++) {
+        for (int j = 0; j < (int)num_cols; j++) {
+            data[i * num_cols + j] = matrix_rand_interval(min, max);
+        }
+    }
+    return r;
+}
+
+
 matrix *matrix_sqr(unsigned int size, size_t element_size) {
-  return matrix_allocate(size, size, element_size);
+  matrix *r = matrix_new(size, size, element_size);
+  if (!r) {
+    return NULL;
+  }
+
+  memset(r->data, 0, size * size * element_size);
+  return r;
 }
 
 matrix *matrix_eye(unsigned int size, size_t element_size, const void *identity_element) {
-    matrix *r = matrix_allocate(size, size, element_size);
+    matrix *r = matrix_new(size, size, element_size);
     if (!r) {
         return NULL;
     }

@@ -1,21 +1,25 @@
 #ifndef MATRIX_H
 #define MATRIX_H
+#include <stdbool.h>
+#include <stdlib.h>
 
-typedef struct nml_mat_s {
+typedef struct matrix_s {
   unsigned int num_rows;
   unsigned int num_cols;
-  double *data; 
-  int is_square;
-} nml_mat;
+  void *data;
+  bool is_square;
+} matrix;
 
-nml_mat* nml_allocate_mat(unsigned int num_rows, unsigned int num_cols);
+typedef void (*print_func)(const void *);
 
-nml_mat* nml_mat_sqr(unsigned int size);
-nml_mat* nml_mat_eye(unsigned int size);
+matrix *matrix_allocate(unsigned int num_rows, unsigned int num_cols, size_t element_size);
 
-void nml_free_mat(nml_mat *mat);
+matrix *matrix_sqr(unsigned int size, size_t element_size);
+matrix *matrix_eye(unsigned int size, size_t element_size, const void *identity_element);
 
-void nml_mat_print(nml_mat *matrix);
-void nml_mat_printf(nml_mat *matrix, const char *d_fmt);
+
+void matrix_free(matrix *mat);
+void matrix_print(const matrix *matrix);
+void matrix_printf(const matrix *matrix, const char *d_fmt);
 
 #endif //MATRIX_H

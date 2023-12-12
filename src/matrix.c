@@ -1,56 +1,68 @@
 #include "matrix.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-nml_mat* nml_allocate_mat(unsigned int num_rows, unsigned int num_cols) {
+matrix *matrix_allocate(unsigned int num_rows, unsigned int num_cols, size_t element_size) {
 
-  nml_mat *mat = (nml_mat*)malloc(sizeof(nml_mat));
+  matrix *mat = malloc(sizeof(matrix));
+  if (!mat) {
+    return NULL;
+  }
+
   mat->num_rows = num_rows;
   mat->num_cols = num_cols;
   mat->is_square = (num_rows == num_cols);
 
-  mat->data = (double*)malloc(num_rows * num_cols * sizeof(double));
+  mat->data = malloc(num_rows * num_cols * element_size);
 
   return mat;
 }
 
-nml_mat* nml_mat_sqr(unsigned int size) {
-  return nml_allocate_mat(size, size);
+matrix *matrix_sqr(unsigned int size, size_t element_size) {
+  return matrix_allocate(size, size, element_size);
 }
 
-nml_mat* nml_mat_eye(unsigned int size) {
-  nml_mat* r = nml_allocate_mat(size, size);
-  
-  for (int i = 0; i < (int)(r->num_rows*r->num_cols); i++) {
-    r->data[i] = 0.0;
-  }
- 
-  for (int i = 0; i < (int)(r->num_rows); i++) {
-    r->data[i * r->num_cols + i] = 1.0;
-  }
+matrix *matrix_eye(unsigned int size, size_t element_size, const void *identity_element) {
+    matrix *r = matrix_allocate(size, size, element_size);
+    if (!r) {
+        return NULL;
+    }
 
-  return r;
+    // Initialize all elements to 0
+    memset(r->data, 0, size * size * element_size);
 
+    // Set diagonal elements to the identity element
+    for (unsigned int i = 0; i < size; i++) {
+        memcpy((char*)r->data + (i * size + i) * element_size, identity_element, element_size);
+    }
+
+    return r;
 }
 
-void nml_free_mat(nml_mat *mat) {
+
+void matrix_free(matrix *mat) {
+  if (!mat) {
+    return;
+  }
+
   free(mat->data); 
   free(mat);
 }
 
-void nml_mat_print(nml_mat *matrix) {
-  nml_mat_printf(matrix, "%lf\t"); 
+void matrix_print(const matrix *matrix) {
+  matrix_printf(matrix, "%lf\t"); 
 }
 
-void nml_mat_printf(nml_mat *matrix, const char *d_fmt) {
+void matrix_printf(const matrix *matrix, const char *d_fmt) {
 
   int i, j;
   fprintf(stdout, "\n");
   
   for(i = 0; i <(int)(matrix->num_rows); ++i) {
     for(j = 0; j < (int)(matrix->num_cols); ++j) {
-      fprintf(stdout, d_fmt, 
-        matrix->data[i*matrix->num_cols + j]); 
+      double value = ((double *)(matrix->data))[i * matrix->num_cols + j];
+      fprintf(stdout, d_fmt, value); 
     }
     fprintf(stdout, "\n");
   }

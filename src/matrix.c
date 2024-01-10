@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 double matrix_rand_interval(double min, double max) {
     double d = (double) rand() / ((double) RAND_MAX + 1);
@@ -102,3 +103,30 @@ void matrix_printf(const matrix *matrix, const char *d_fmt) {
   fprintf(stdout, "\n");
 }
 
+
+int matrix_eqdim(const matrix *m1, const matrix *m2) {
+    return (m1->num_cols == m2->num_cols) && (m1->num_rows == m2->num_rows);
+}
+
+int matrix_eq(const matrix *m1, const matrix *m2, double tolerance) {
+    if (!matrix_eqdim(m1, m2)) {
+        printf("Matrices are not the same dimension!\n"); 
+        return 0;
+    }
+
+    for (unsigned int i = 0; i < m1->num_rows; i++) {
+        for (unsigned int j = 0; j < m1->num_cols; j++) {
+            size_t element_size = sizeof(double); // Assuming elements are type double
+            size_t index = i * m1->num_cols * element_size + j * element_size;
+            double *elem1 = (double*)((char*)m1->data + index);
+            double *elem2 = (double*)((char*)m2->data + index);
+            
+            if (fabs(*elem1 - *elem2) > tolerance) {
+                printf("Mismatch in row %u and column %u\n", i, j); // Use %u for unsigned integers
+                return 0;
+            }
+        }
+    }
+
+    return 1; // If we reach here, matrices are equal within the specified tolerance
+}

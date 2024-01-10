@@ -26,4 +26,7 @@ void matrix_free(matrix *mat);
 void matrix_print(const matrix *matrix);
 void matrix_printf(const matrix *matrix, const char *d_fmt);
 
+int matrix_eqdim(const matrix *m1, const matrix *m2);
+int matrix_eq(const matrix *m1, const matrix *m2, double tolerance);
+
 #endif //MATRIX_H

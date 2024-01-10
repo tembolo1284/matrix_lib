@@ -1,6 +1,6 @@
 #include <criterion/criterion.h>
 #include <criterion/logging.h>
-#include "../include/matrix.h"  // Replace with your actual matrix library header
+#include "../include/matrix.h"  
 
 // Test case for matrix allocation
 Test(matrix, new_3by4) {

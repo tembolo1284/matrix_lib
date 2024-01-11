@@ -20,11 +20,23 @@ int main() {
     printf("First matrix of doubles 2x3 from 1.0 to 6.0\n");
     matrix_print(mat);
 
+
+    printf("Printing third column of the matrix above.\n");
+
+    matrix *mat_col3 = matrix_col_get(mat, 2);
+    matrix_print(mat_col3);
+    matrix_free(mat_col3); 
+
+    printf("Print second row of the matrix above.\n");
+    matrix *mat_row2 = matrix_row_get(mat, 1);
+    matrix_print(mat_row2);
+    matrix_free(mat_row2);
+
     // Free memory
     matrix_free(mat);
 
     matrix *mat1 = matrix_rand(3, 4, 0.0, 10.0, sizeof(double));
-    printf("Second matrix of random doubles 3x4 with values from 0.0-10.0\n");
+    printf("\nSecond matrix of random doubles 3x4 with values from 0.0-10.0\n");
     matrix_print(mat1);
 
     // Allocate 4x4 int square matrix

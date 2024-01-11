@@ -92,4 +92,26 @@ Test(matrix, eq_outside_tolerance) {
     matrix_free(mat1);
     matrix_free(mat2);
 }
+// Test for matrix_col_get function
+Test(matrix, col_get) {
+    unsigned int rows = 3, cols = 4, col_num = 2;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+    matrix *col = matrix_col_get(mat, col_num);
+    cr_assert_not_null(col, "matrix_col_get returned NULL");
+    cr_assert_eq(col->num_rows, mat->num_rows, "Incorrect number of rows in column matrix");
+    cr_assert_eq(col->num_cols, 1, "Column matrix should have only 1 column");
+    matrix_free(mat);
+    matrix_free(col);
+}
 
+// Test for matrix_row_get function
+Test(matrix, row_get) {
+    unsigned int rows = 3, cols = 4, row_num = 1;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+    matrix *row = matrix_row_get(mat, row_num);
+    cr_assert_not_null(row, "matrix_row_get returned NULL");
+    cr_assert_eq(row->num_cols, mat->num_cols, "Incorrect number of columns in row matrix");
+    cr_assert_eq(row->num_rows, 1, "Row matrix should have only 1 row");
+    matrix_free(mat);
+    matrix_free(row);
+}

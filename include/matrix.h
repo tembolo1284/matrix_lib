@@ -29,4 +29,8 @@ void matrix_printf(const matrix *matrix, const char *d_fmt);
 int matrix_eqdim(const matrix *m1, const matrix *m2);
 int matrix_eq(const matrix *m1, const matrix *m2, double tolerance);
 
+matrix *matrix_col_get(const matrix *mat, unsigned int col_num);
+matrix *matrix_row_get(const matrix *mat, unsigned int row_num);
+
+
 #endif //MATRIX_H

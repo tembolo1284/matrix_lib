@@ -130,3 +130,39 @@ int matrix_eq(const matrix *m1, const matrix *m2, double tolerance) {
 
     return 1; // If we reach here, matrices are equal within the specified tolerance
 }
+
+matrix *matrix_col_get(const matrix *mat, unsigned int col_num) {
+    if (col_num >= mat->num_cols) {
+        return NULL; // Column number is out of bounds
+    }
+
+    matrix *col_matrix = matrix_new(mat->num_rows, 1, sizeof(double));
+    if (!col_matrix) {
+        return NULL; // Failed to allocate new matrix
+    }
+
+    for (unsigned int i = 0; i < mat->num_rows; ++i) {
+        double *src = (double *)mat->data + i * mat->num_cols + col_num;
+        double *dest = (double *)col_matrix->data + i;
+        *dest = *src;
+    }
+
+    return col_matrix;
+}
+
+matrix *matrix_row_get(const matrix *mat, unsigned int row_num) {
+    if (row_num >= mat->num_rows) {
+        return NULL; // Row number is out of bounds
+    }
+
+    matrix *row_matrix = matrix_new(1, mat->num_cols, sizeof(double));
+    if (!row_matrix) {
+        return NULL; // Failed to allocate new matrix
+    }
+
+    double *src = (double *)mat->data + row_num * mat->num_cols;
+    memcpy(row_matrix->data, src, mat->num_cols * sizeof(double));
+
+    return row_matrix;
+}
+

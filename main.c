@@ -23,19 +23,6 @@ int main() {
     printf("First matrix of doubles 2x3 from 1.0 to 6.0\n");
     matrix_print(mat);
 
-
-    printf("Printing third column of the matrix above.\n");
-
-    matrix *mat_col3 = matrix_col_get(mat, 2);
-    matrix_print(mat_col3);
-    matrix_free(mat_col3); 
-
-    printf("Print second row of the matrix above.\n");
-    matrix *mat_row2 = matrix_row_get(mat, 1);
-    matrix_print(mat_row2);
-    matrix_free(mat_row2);
-
-    // Free memory
     matrix_free(mat);
 
     matrix *mat1 = matrix_rand(3, 4, 0.0, 10.0, sizeof(double));
@@ -154,8 +141,18 @@ int main() {
     printf("Matrix should have all diagonal entries of 5.0\n");
     matrix_print(mat_diag);
 
+    matrix *mat_all_sliced = matrix_slice(mat_all, all, all);
+
+    printf("Confirming matrix_slice all worked for matrix of all 5s.\n");
+    matrix_print(mat_all_sliced);
+  
+    printf("%p\n", (void*)mat_all);
+    printf("%p\n", (void*)mat_all_sliced);
+
     matrix_free(mat_all);
     matrix_free(mat_diag);
+    matrix_free(mat_all_sliced);
+
 
     return 0;
 }

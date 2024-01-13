@@ -1,5 +1,6 @@
 #include <criterion/criterion.h>
 #include <criterion/logging.h>
+#include <stdio.h>
 #include "../include/matrix.h"  // Replace with your actual matrix library header
 
 Test(matrix, eqdim_same_dimensions) {
@@ -92,29 +93,6 @@ Test(matrix, eq_outside_tolerance) {
     matrix_free(mat1);
     matrix_free(mat2);
 }
-// Test for matrix_col_get function
-Test(matrix, col_get) {
-    unsigned int rows = 3, cols = 4, col_num = 2;
-    matrix *mat = matrix_new(rows, cols, sizeof(double));
-    matrix *col = matrix_col_get(mat, col_num);
-    cr_assert_not_null(col, "matrix_col_get returned NULL");
-    cr_assert_eq(col->num_rows, mat->num_rows, "Incorrect number of rows in column matrix");
-    cr_assert_eq(col->num_cols, 1, "Column matrix should have only 1 column");
-    matrix_free(mat);
-    matrix_free(col);
-}
-
-// Test for matrix_row_get function
-Test(matrix, row_get) {
-    unsigned int rows = 3, cols = 4, row_num = 1;
-    matrix *mat = matrix_new(rows, cols, sizeof(double));
-    matrix *row = matrix_row_get(mat, row_num);
-    cr_assert_not_null(row, "matrix_row_get returned NULL");
-    cr_assert_eq(row->num_cols, mat->num_cols, "Incorrect number of columns in row matrix");
-    cr_assert_eq(row->num_rows, 1, "Row matrix should have only 1 row");
-    matrix_free(mat);
-    matrix_free(row);
-}
 
 // Test for matrix_slice function for a single row
 Test(matrix, slice_single_row) {
@@ -173,3 +151,118 @@ Test(matrix, slice_row_col_range) {
     matrix_free(submatrix);
 }
 
+Test(matrix, slice_full_matrix) {
+    unsigned int rows = 3, cols = 4;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+
+    Range all_rows = {-1, -1};
+    Range all_cols = {-1, -1};
+    matrix *sliced = matrix_slice(mat, all_rows, all_cols);
+
+    cr_assert_not_null(sliced, "matrix_slice returned NULL for full matrix");
+    cr_assert_eq(sliced->num_rows, rows, "Sliced matrix should have all rows");
+    cr_assert_eq(sliced->num_cols, cols, "Sliced matrix should have all columns");
+
+    matrix_free(mat);
+    matrix_free(sliced);
+}
+
+/*
+Test(matrix, slice_all_rows_one_column) {
+    unsigned int rows = 3, cols = 4, col_num = 1;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+
+    Range all_rows = {-1, -1};
+    Range single_col = {col_num, col_num + 1};
+    matrix *sliced = matrix_slice(mat, all_rows, single_col);
+
+    cr_assert_not_null(sliced, "matrix_slice returned NULL for all rows and one column");
+    cr_assert_eq(sliced->num_rows, rows, "Sliced matrix should have all rows");
+    cr_assert_eq(sliced->num_cols, 1, "Sliced matrix should have one column");
+
+    matrix_free(mat);
+    matrix_free(sliced);
+}
+
+
+Test(matrix, slice_all_rows_range_of_columns) {
+    unsigned int rows = 3, cols = 4;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+
+    Range all_rows = {-1, -1};
+    Range col_range = {1, 3};  // Columns 2 to 3
+    matrix *sliced = matrix_slice(mat, all_rows, col_range);
+
+    cr_assert_not_null(sliced, "matrix_slice returned NULL for all rows and range of columns");
+    cr_assert_eq(sliced->num_rows, rows, "Sliced matrix should have all rows");
+    cr_assert_eq(sliced->num_cols, 2, "Sliced matrix should have range of columns");
+
+    matrix_free(mat);
+    matrix_free(sliced);
+}
+
+
+Test(matrix, slice_range_of_rows_one_column) {
+    unsigned int rows = 4, cols = 5, col_num = 2;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+
+    Range row_range = {1, 3};  // Rows 2 to 3
+    Range single_col = {col_num, col_num + 1};
+    matrix *sliced = matrix_slice(mat, row_range, single_col);
+    cr_assert_not_null(sliced, "matrix_slice returned NULL for range of rows and one column");
+    cr_assert_eq(sliced->num_rows, 2, "Sliced matrix should have range of rows");
+    cr_assert_eq(sliced->num_cols, 1, "Sliced matrix should have one column");
+
+    matrix_free(mat);
+    matrix_free(sliced);
+}
+
+Test(matrix, slice_range_of_rows_and_columns) {
+    unsigned int rows = 4, cols = 5;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+
+    Range row_range = {1, 3}; // Rows 2 to 3
+    Range col_range = {2, 4}; // Columns 3 to 4
+    matrix *sliced = matrix_slice(mat, row_range, col_range);
+
+    cr_assert_not_null(sliced, "matrix_slice returned NULL for range of rows and columns");
+    cr_assert_eq(sliced->num_rows, 2, "Sliced matrix should have range of rows");
+    cr_assert_eq(sliced->num_cols, 2, "Sliced matrix should have range of columns");
+
+    matrix_free(mat);
+    matrix_free(sliced);
+}
+
+Test(matrix, slice_one_row_one_column) {
+    unsigned int rows = 3, cols = 4, row_num = 1, col_num = 2;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+
+    Range single_row = {row_num, row_num + 1};
+    Range single_col = {col_num, col_num + 1};
+    matrix *sliced = matrix_slice(mat, single_row, single_col);
+
+    cr_assert_not_null(sliced, "matrix_slice returned NULL for one row and one column");
+    cr_assert_eq(sliced->num_rows, 1, "Sliced matrix should have one row");
+    cr_assert_eq(sliced->num_cols, 1, "Sliced matrix should have one column");
+
+    matrix_free(mat);
+    matrix_free(sliced);
+}
+
+Test(matrix, slice_one_row_range_of_columns) {
+    unsigned int rows = 3, cols = 4, row_num = 1;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+
+    Range single_row = {row_num, row_num + 1};
+    Range col_range = {1, 3}; // Columns 2 to 3
+    matrix *sliced = matrix_slice(mat, single_row, col_range);
+
+    cr_assert_not_null(sliced, "matrix_slice returned NULL for one row and range of columns");
+    cr_assert_eq(sliced->num_rows, 1, "Sliced matrix should have one row");
+    cr_assert_eq(sliced->num_cols, 2, "Sliced matrix should have range of columns");
+
+    matrix_free(mat);
+    matrix_free(sliced);
+}
+
+*/

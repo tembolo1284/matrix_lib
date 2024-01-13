@@ -12,7 +12,7 @@ double matrix_rand_interval(double min, double max) {
 
 matrix *matrix_new(unsigned int num_rows, unsigned int num_cols, size_t element_size) {
 
-  matrix *mat = malloc(sizeof(matrix));
+  matrix *mat = calloc(1, sizeof(matrix));
   if (!mat) {
     return NULL;
   }
@@ -21,7 +21,12 @@ matrix *matrix_new(unsigned int num_rows, unsigned int num_cols, size_t element_
   mat->num_cols = num_cols;
   mat->is_square = (num_rows == num_cols);
 
-  mat->data = malloc(num_rows * num_cols * element_size);
+  mat->data = calloc(num_rows * num_cols, element_size);
+  if (!mat->data) {
+    free(mat);
+    return NULL;
+  }
+
 
   return mat;
 }
@@ -131,41 +136,6 @@ int matrix_eq(const matrix *m1, const matrix *m2, double tolerance) {
     return 1; // If we reach here, matrices are equal within the specified tolerance
 }
 
-matrix *matrix_col_get(const matrix *mat, unsigned int col_num) {
-    if (col_num >= mat->num_cols) {
-        return NULL; // Column number is out of bounds
-    }
-
-    matrix *col_matrix = matrix_new(mat->num_rows, 1, sizeof(double));
-    if (!col_matrix) {
-        return NULL; // Failed to allocate new matrix
-    }
-
-    for (unsigned int i = 0; i < mat->num_rows; ++i) {
-        double *src = (double *)mat->data + i * mat->num_cols + col_num;
-        double *dest = (double *)col_matrix->data + i;
-        *dest = *src;
-    }
-
-    return col_matrix;
-}
-
-matrix *matrix_row_get(const matrix *mat, unsigned int row_num) {
-    if (row_num >= mat->num_rows) {
-        return NULL; // Row number is out of bounds
-    }
-
-    matrix *row_matrix = matrix_new(1, mat->num_cols, sizeof(double));
-    if (!row_matrix) {
-        return NULL; // Failed to allocate new matrix
-    }
-
-    double *src = (double *)mat->data + row_num * mat->num_cols;
-    memcpy(row_matrix->data, src, mat->num_cols * sizeof(double));
-
-    return row_matrix;
-}
-
 double matrix_at(const matrix *mat, unsigned int i, unsigned int j) {
     if (i >= mat->num_rows || j >= mat->num_cols) {
         fprintf(stderr, "Index out of bounds\n");
@@ -178,7 +148,7 @@ matrix *matrix_slice(matrix *mat, Range row_range, Range col_range) {
     // Check if all rows are needed
     if (row_range.start == -1) {
         if (col_range.start == -1) { // All rows, all columns
-            return mat; // For now will return just mat itself. May make a copy and return in future.
+            return matrix_copy(mat);
         } else {
             return matrix_submatrix(mat, row_range, col_range);
         }
@@ -250,12 +220,41 @@ void matrix_all_set(matrix *mat, const void *value, size_t value_size) {
 }
 
 void matrix_diag_set(matrix *mat, const void *value, size_t value_size) {
-    unsigned int min_dim = mat->num_rows < mat->num_cols ? mat->num_rows : mat->num_cols;
+    // Check if the matrix is square
+    if (mat->num_rows != mat->num_cols) {
+        fprintf(stderr, "Error: Matrix is not square.\n");
+        return;
+    }
+
+    unsigned int min_dim = mat->num_rows;  // Since the matrix is square, num_rows == num_cols
     for (unsigned int i = 0; i < min_dim; ++i) {
         unsigned int index = i * mat->num_cols + i;
         memcpy((char *)mat->data + index * value_size, value, value_size);
     }
 }
 
+matrix *matrix_copy(const matrix *src) {
+    if (src == NULL) {
+        return NULL; // Handle null source matrix
+    }
 
+    // Manually allocate memory for the new matrix structure
+    matrix *copy = malloc(sizeof(matrix));
+    if (!copy) {
+        return NULL; // Handle memory allocation failure
+    }
+
+    // Copy the matrix structure (excluding the data pointer)
+    *copy = *src;
+
+    // Allocate memory for the data array and copy the data
+    copy->data = malloc(src->num_rows * src->num_cols * sizeof(double));
+    if (!copy->data) {
+        free(copy); // Clean up if data allocation fails
+        return NULL;
+    }
+    memcpy(copy->data, src->data, src->num_rows * src->num_cols * sizeof(double));
+
+    return copy;
+}
 

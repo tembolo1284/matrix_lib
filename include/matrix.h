@@ -39,8 +39,7 @@ matrix *matrix_row_get(const matrix *mat, unsigned int row_num);
 double matrix_at(const matrix *mat, unsigned int i, unsigned int j);
 matrix *matrix_slice(matrix *mat, Range row_range, Range col_range);
 matrix *matrix_submatrix(const matrix *mat, Range row_range, Range col_range);
-matrix *matrix_row_range_get(const matrix *mat, Range row_range);
-matrix *matrix_col_range_get(const matrix *mat, Range col_range);
+matrix *matrix_copy(const matrix *src);
 
 void matrix_all_set(matrix *mat, const void *value, size_t value_size);
 void matrix_diag_set(matrix *mat, const void *value, size_t value_size);

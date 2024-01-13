@@ -174,47 +174,53 @@ double matrix_at(const matrix *mat, unsigned int i, unsigned int j) {
     return ((double*)mat->data)[i * mat->num_cols + j];
 }
 
-matrix *matrix_slice(const matrix *mat, Range row_range, Range col_range) {
+matrix *matrix_slice(matrix *mat, Range row_range, Range col_range) {
     // Check if all rows are needed
     if (row_range.start == -1) {
         if (col_range.start == -1) { // All rows, all columns
             return mat; // For now will return just mat itself. May make a copy and return in future.
-        } else { 
-          // All other cases of single column or range of columns will just be a matrix_submatrix call
+        } else {
             return matrix_submatrix(mat, row_range, col_range);
         }
+    } else { 
+      // All other cases of single column or range of columns will just be a matrix_submatrix call
+            return matrix_submatrix(mat, row_range, col_range);
     }
+    
     printf("matrix slice not successfully executed.");
     return NULL;   
 }
 
 matrix *matrix_submatrix(const matrix *mat, Range row_range, Range col_range) {
      // Check for negative indices for start
-    if (row_range.start < 0 || col_range.start < 0) {
-        fprintf(stderr, "Negative start index in range\n");
+    if (row_range.start < -1 || col_range.start < -1) {
+        fprintf(stderr, "Invalid start index in range\n");
         return NULL;
     }
 
     // Check for negative indices for end, not including -1
-    if ((row_range.end < 0 && row_range.end != -1) || 
-        (col_range.end < 0 && col_range.end != -1)) {
+    if ((row_range.end < -1) || (col_range.end < -1)) {
         fprintf(stderr, "Invalid end index in range\n");
         return NULL;
     }
 
+    // Determine the start indices, handling the -1 case
+    unsigned int row_start = (row_range.start == -1) ? 0 : row_range.start;
+    unsigned int col_start = (col_range.start == -1) ? 0 : col_range.start;
+
     // Determine the end indices, handling the -1 case
-    unsigned int row_end = (row_range.end == -1) ? mat->num_rows : (unsigned int)row_range.end;
-    unsigned int col_end = (col_range.end == -1) ? mat->num_cols : (unsigned int)col_range.end;
+    unsigned int row_end = (row_range.end == -1) ? (mat->num_rows) : (unsigned int)row_range.end;
+    unsigned int col_end = (col_range.end == -1) ? (mat->num_cols) : (unsigned int)col_range.end;
 
     // Check if end indices exceed matrix dimensions
-    if (row_end > mat->num_rows || col_end > mat->num_cols) {
+    if ((row_end - 1) > mat->num_rows || (col_end - 1) > mat->num_cols) {
         fprintf(stderr, "Range end exceeds matrix dimensions\n");
         return NULL;
     }
 
     // Calculate new dimensions
-    unsigned int new_rows = row_end - row_range.start;
-    unsigned int new_cols = col_end - col_range.start;    
+    unsigned int new_rows = (row_range.end == -1) ? row_end : row_end - row_start;
+    unsigned int new_cols = (col_range.end == -1) ? col_end : col_end - col_start;    
 
 
     matrix *submat = matrix_new(new_rows, new_cols, sizeof(double));
@@ -227,7 +233,7 @@ matrix *matrix_submatrix(const matrix *mat, Range row_range, Range col_range) {
     for (unsigned int i = 0; i < new_rows; ++i) {
         for (unsigned int j = 0; j < new_cols; ++j) {
             ((double*)submat->data)[i * new_cols + j] = 
-                ((double*)mat->data)[(row_range.start + i) * mat->num_cols + (col_range.start + j)];
+                ((double*)mat->data)[(row_start + i) * mat->num_cols + (col_start + j)];
         }
     }
 

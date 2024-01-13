@@ -37,7 +37,7 @@ matrix *matrix_col_get(const matrix *mat, unsigned int col_num);
 matrix *matrix_row_get(const matrix *mat, unsigned int row_num);
 
 double matrix_at(const matrix *mat, unsigned int i, unsigned int j);
-matrix *matrix_slice(const matrix *mat, Range row_range, Range col_range);
+matrix *matrix_slice(matrix *mat, Range row_range, Range col_range);
 matrix *matrix_submatrix(const matrix *mat, Range row_range, Range col_range);
 matrix *matrix_row_range_get(const matrix *mat, Range row_range);
 matrix *matrix_col_range_get(const matrix *mat, Range col_range);

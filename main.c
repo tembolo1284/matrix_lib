@@ -80,11 +80,11 @@ int main() {
     Range all = { -1, -1 };
     Range single_row = { 1, 2 }; // 2nd row only
     Range single_col = { 2, 3 }; // 3rd column only
-    Range row_range = { 1, 4 }; // Rows 2 to 3
-    Range col_range = { 2, 5 }; // Columns 3 to 4
+    Range row_range = { 1, 3 }; // Rows 2 to 3
+    Range col_range = { 2, 4 }; // Columns 3 to 4
 
 
-    matrix *mat0 = matrix_new(3, 3, sizeof(double));
+    matrix *mat0 = matrix_new(3, 5, sizeof(double));
     if (!mat) return 1;
   
     // Initialize values for double matrix
@@ -98,8 +98,14 @@ int main() {
     data_double1[6] = 7.0;
     data_double1[7] = 8.0;
     data_double1[8] = 9.0;
+    data_double1[9] = 10.0;
+    data_double1[10] = 11.0;
+    data_double1[11] = 12.0;
+    data_double1[12] = 13.0;
+    data_double1[13] = 14.0;
+    data_double1[14] = 15.0;
 
-    printf("Print 3x3 which should be from 1-9\n");
+    printf("Print 3x5 which should be from 1-15\n");
     matrix_print(mat0);
 
     // Get 2nd row, all columns
@@ -116,7 +122,7 @@ int main() {
     printf("Print rows 2 and 3, all columns\n");
     matrix *row_range_mat = matrix_slice(mat0, row_range, all);
     if (row_range_mat == NULL) {
-        printf("Your matrix is NULL sir!");
+        printf("Your matrix is NULL sir!\n");
     } else { 
             matrix_print(row_range_mat);
            }

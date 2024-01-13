@@ -16,6 +16,9 @@ int main() {
     data_double[4] = 5.0;
     data_double[5] = 6.0;
 
+    double mat_idx12 = matrix_at(mat, 0, 1);
+    
+    printf("printing value at location mat[1,2]: %lf\n", mat_idx12);
     // Print the double matrix
     printf("First matrix of doubles 2x3 from 1.0 to 6.0\n");
     matrix_print(mat);
@@ -73,6 +76,80 @@ int main() {
 
     // Free the matrix memory
     matrix_free(mat3);
+
+    Range all = { -1, -1 };
+    Range single_row = { 1, 2 }; // 2nd row only
+    Range single_col = { 2, 3 }; // 3rd column only
+    Range row_range = { 1, 4 }; // Rows 2 to 3
+    Range col_range = { 2, 5 }; // Columns 3 to 4
+
+
+    matrix *mat0 = matrix_new(3, 3, sizeof(double));
+    if (!mat) return 1;
+  
+    // Initialize values for double matrix
+    double *data_double1 = (double *)mat0->data;
+    data_double1[0] = 1.0;
+    data_double1[1] = 2.0;
+    data_double1[2] = 3.0;
+    data_double1[3] = 4.0;
+    data_double1[4] = 5.0;
+    data_double1[5] = 6.0;
+    data_double1[6] = 7.0;
+    data_double1[7] = 8.0;
+    data_double1[8] = 9.0;
+
+    printf("Print 3x3 which should be from 1-9\n");
+    matrix_print(mat0);
+
+    // Get 2nd row, all columns
+    printf("Print 2nd row, all columns\n");
+    matrix *row_mat = matrix_slice(mat0, single_row, all);
+    matrix_print(row_mat);
+
+    // Get all rows, 3rd column
+    printf("Print all rows, 3rd column\n");
+    matrix *col_mat = matrix_slice(mat0, all, single_col);
+    matrix_print(col_mat);
+
+    // Get rows 2 to 3, all columns
+    printf("Print rows 2 and 3, all columns\n");
+    matrix *row_range_mat = matrix_slice(mat0, row_range, all);
+    if (row_range_mat == NULL) {
+        printf("Your matrix is NULL sir!");
+    } else { 
+            matrix_print(row_range_mat);
+           }
+
+    // Get all rows, columns 3 to 4
+    printf("Print all rows, columns 3 and 4\n");
+    matrix *col_range_mat = matrix_slice(mat0, all, col_range);
+    matrix_print(col_range_mat);
+    
+
+    matrix_free(mat0);
+    matrix_free(row_mat);
+    matrix_free(col_mat);
+    matrix_free(row_range_mat);
+    matrix_free(col_range_mat);   
+
+    matrix *mat_all = matrix_new(5, 4, sizeof(double));
+    matrix *mat_diag = matrix_new(4, 4, sizeof(double)); 
+    double val1 = 5.0;
+    size_t value_size = sizeof(double);
+
+
+    matrix_all_set(mat_all, &val1, value_size);
+    matrix_diag_set(mat_diag, &val1, value_size);
+
+    printf("Matrix should be all 5s\n");
+    matrix_print(mat_all);
+
+    printf("Matrix should have all diagonal entries of 5.0\n");
+    matrix_print(mat_diag);
+
+    matrix_free(mat_all);
+    matrix_free(mat_diag);
 
     return 0;
 }

@@ -166,3 +166,90 @@ matrix *matrix_row_get(const matrix *mat, unsigned int row_num) {
     return row_matrix;
 }
 
+double matrix_at(const matrix *mat, unsigned int i, unsigned int j) {
+    if (i >= mat->num_rows || j >= mat->num_cols) {
+        fprintf(stderr, "Index out of bounds\n");
+        exit(EXIT_FAILURE);
+    }
+    return ((double*)mat->data)[i * mat->num_cols + j];
+}
+
+matrix *matrix_slice(const matrix *mat, Range row_range, Range col_range) {
+    // Check if all rows are needed
+    if (row_range.start == -1) {
+        if (col_range.start == -1) { // All rows, all columns
+            return mat; // For now will return just mat itself. May make a copy and return in future.
+        } else { 
+          // All other cases of single column or range of columns will just be a matrix_submatrix call
+            return matrix_submatrix(mat, row_range, col_range);
+        }
+    }
+    printf("matrix slice not successfully executed.");
+    return NULL;   
+}
+
+matrix *matrix_submatrix(const matrix *mat, Range row_range, Range col_range) {
+     // Check for negative indices for start
+    if (row_range.start < 0 || col_range.start < 0) {
+        fprintf(stderr, "Negative start index in range\n");
+        return NULL;
+    }
+
+    // Check for negative indices for end, not including -1
+    if ((row_range.end < 0 && row_range.end != -1) || 
+        (col_range.end < 0 && col_range.end != -1)) {
+        fprintf(stderr, "Invalid end index in range\n");
+        return NULL;
+    }
+
+    // Determine the end indices, handling the -1 case
+    unsigned int row_end = (row_range.end == -1) ? mat->num_rows : (unsigned int)row_range.end;
+    unsigned int col_end = (col_range.end == -1) ? mat->num_cols : (unsigned int)col_range.end;
+
+    // Check if end indices exceed matrix dimensions
+    if (row_end > mat->num_rows || col_end > mat->num_cols) {
+        fprintf(stderr, "Range end exceeds matrix dimensions\n");
+        return NULL;
+    }
+
+    // Calculate new dimensions
+    unsigned int new_rows = row_end - row_range.start;
+    unsigned int new_cols = col_end - col_range.start;    
+
+
+    matrix *submat = matrix_new(new_rows, new_cols, sizeof(double));
+    if (!submat) {
+        fprintf(stderr, "Failed to allocate memory for submatrix\n");
+        return NULL;
+    }
+
+    // Copy data from the original matrix to the submatrix
+    for (unsigned int i = 0; i < new_rows; ++i) {
+        for (unsigned int j = 0; j < new_cols; ++j) {
+            ((double*)submat->data)[i * new_cols + j] = 
+                ((double*)mat->data)[(row_range.start + i) * mat->num_cols + (col_range.start + j)];
+        }
+    }
+
+    return submat;
+}
+
+void matrix_all_set(matrix *mat, const void *value, size_t value_size) {
+    for (unsigned int i = 0; i < mat->num_rows; ++i) {
+        for (unsigned int j = 0; j < mat->num_cols; ++j) {
+            unsigned int index = i * mat->num_cols + j;
+            memcpy((char *)mat->data + index * value_size, value, value_size);
+        }
+    }
+}
+
+void matrix_diag_set(matrix *mat, const void *value, size_t value_size) {
+    unsigned int min_dim = mat->num_rows < mat->num_cols ? mat->num_rows : mat->num_cols;
+    for (unsigned int i = 0; i < min_dim; ++i) {
+        unsigned int index = i * mat->num_cols + i;
+        memcpy((char *)mat->data + index * value_size, value, value_size);
+    }
+}
+
+
+

@@ -115,3 +115,61 @@ Test(matrix, row_get) {
     matrix_free(mat);
     matrix_free(row);
 }
+
+// Test for matrix_slice function for a single row
+Test(matrix, slice_single_row) {
+    unsigned int rows = 3, cols = 4;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+
+    // Initialize matrix data...
+
+    Range single_row = {1, 2}; // 2nd row only
+    Range all_cols = {-1, -1}; // All columns
+    matrix *sliced_row = matrix_slice(mat, single_row, all_cols);
+
+    cr_assert_not_null(sliced_row, "matrix_slice returned NULL for single row");
+    cr_assert_eq(sliced_row->num_rows, 1, "Sliced row matrix should have 1 row");
+    cr_assert_eq(sliced_row->num_cols, cols, "Sliced row matrix should have all columns");
+
+    matrix_free(mat);
+    matrix_free(sliced_row);
+}
+
+// Test for matrix_slice function for a single column
+Test(matrix, slice_single_column) {
+    unsigned int rows = 3, cols = 4;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+
+    // Initialize matrix data...
+
+    Range all_rows = {-1, -1}; // All rows
+    Range single_col = {2, 3}; // 3rd column only
+    matrix *sliced_col = matrix_slice(mat, all_rows, single_col);
+
+    cr_assert_not_null(sliced_col, "matrix_slice returned NULL for single column");
+    cr_assert_eq(sliced_col->num_rows, rows, "Sliced column matrix should have all rows");
+    cr_assert_eq(sliced_col->num_cols, 1, "Sliced column matrix should have 1 column");
+
+    matrix_free(mat);
+    matrix_free(sliced_col);
+}
+
+// Test for matrix_slice function for a range of rows and columns
+Test(matrix, slice_row_col_range) {
+    unsigned int rows = 4, cols = 5;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+
+    // Initialize matrix data...
+
+    Range row_range = {1, 3}; // Rows 2 to 3
+    Range col_range = {2, 4}; // Columns 3 to 4
+    matrix *submatrix = matrix_slice(mat, row_range, col_range);
+
+    cr_assert_not_null(submatrix, "matrix_slice returned NULL for row and column range");
+    cr_assert_eq(submatrix->num_rows, 2, "Submatrix should have 2 rows");
+    cr_assert_eq(submatrix->num_cols, 2, "Submatrix should have 2 columns");
+
+    matrix_free(mat);
+    matrix_free(submatrix);
+}
+

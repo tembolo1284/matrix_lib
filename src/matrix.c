@@ -258,3 +258,38 @@ matrix *matrix_copy(const matrix *src) {
     return copy;
 }
 
+
+/*Matrix math operations*/
+
+void matrix_row_mult_r(matrix *mat, unsigned int row, double value) {
+    if (row >= mat->num_rows) {
+        fprintf(stderr, "Row index out of bounds\n");
+        return;
+    }
+
+    for (unsigned int j = 0; j < mat->num_cols; ++j) {
+        ((double *)mat->data)[row * mat->num_cols + j] *= value;
+    }
+}
+
+void matrix_col_mult_r(matrix *mat, unsigned int col, double value) {
+    if (col >= mat->num_cols) {
+        fprintf(stderr, "Column index out of bounds\n");
+        return;
+    }
+
+    for (unsigned int i = 0; i < mat->num_rows; ++i) {
+        ((double *)mat->data)[i * mat->num_cols + col] *= value;
+    }
+}
+
+void matrix_mult_r(matrix *mat, double value) {
+    for (unsigned int i = 0; i < mat->num_rows; ++i) {
+        for (unsigned int j = 0; j < mat->num_cols; ++j) {
+            ((double *)mat->data)[i * mat->num_cols + j] *= value;
+        }
+    }
+}
+
+
+

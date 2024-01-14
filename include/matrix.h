@@ -44,5 +44,16 @@ matrix *matrix_copy(const matrix *src);
 void matrix_all_set(matrix *mat, const void *value, size_t value_size);
 void matrix_diag_set(matrix *mat, const void *value, size_t value_size);
 
+/*Matrix math operations*/
+//multiply a row with a scalar
+void matrix_row_mult_r(matrix *mat, unsigned int row, double value);
+
+//multiply a column with a scalar
+void matrix_col_mult_r(matrix *mat, unsigned int col, double value);
+
+//multiply a matrix with a scalar (all rows and columns)
+void matrix_mult_r(matrix *mat, double value);
+
+
 
 #endif //MATRIX_H

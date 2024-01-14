@@ -80,10 +80,10 @@ Test(matrix, eq_outside_tolerance) {
     data1[2] = 3.0;
     data1[3] = 4.0;
 
-    data2[0] = 1.03; // Outside tolerance of 0.02
-    data2[1] = 2.01; // Within tolerance of 0.02
-    data2[2] = 3.0;  // Exact match
-    data2[3] = 4.0;  // Exact match
+    data2[0] = 1.0;
+    data2[1] = 2.0;
+    data2[2] = 3.05;
+    data2[3] = 4.0;
 
     double tolerance = 0.02; // Set your desired tolerance value
 
@@ -167,7 +167,7 @@ Test(matrix, slice_full_matrix) {
     matrix_free(sliced);
 }
 
-/*
+
 Test(matrix, slice_all_rows_one_column) {
     unsigned int rows = 3, cols = 4, col_num = 1;
     matrix *mat = matrix_new(rows, cols, sizeof(double));
@@ -265,4 +265,4 @@ Test(matrix, slice_one_row_range_of_columns) {
     matrix_free(sliced);
 }
 
-*/
+

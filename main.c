@@ -146,8 +146,8 @@ int main() {
     printf("Confirming matrix_slice all worked for matrix of all 5s.\n");
     matrix_print(mat_all_sliced);
   
-    printf("%p\n", (void*)mat_all);
-    printf("%p\n", (void*)mat_all_sliced);
+    printf("Memory address of original matrix: %p\n", (void*)mat_all);
+    printf("Memory address of copied matrix: %p\n", (void*)mat_all_sliced);
 
     matrix_free(mat_all);
     matrix_free(mat_diag);

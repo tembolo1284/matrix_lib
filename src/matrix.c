@@ -390,8 +390,13 @@ void matrix_row_addrow(matrix *mat, unsigned int row1_index, unsigned int row2_i
     }
 
     // Check if row indices are within the bounds of the matrix
-    if (row1_index >= mat->num_rows || row2_index >= mat->num_rows || result_row_index >= mat->num_rows) {
-        fprintf(stderr, "Error: Row index out of bounds.\n");
+    if (row1_index >= mat->num_rows || row2_index >= mat->num_rows) {
+        fprintf(stderr, "Error: Your matrix 1 or matrix 2 Row index selection is out of bounds.\n");
+        return;
+    }
+
+    if (result_row_index >= mat->num_rows) {
+        fprintf(stderr, "Error: Your result row selection index is out of bounds.\n");
         return;
     }
 

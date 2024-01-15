@@ -1,6 +1,7 @@
 BINARY=main
 LIBRARY=libmatrix
 LIBDIR=./library
+TESTCOVERAGEDIR=./test_coverage
 
 TEST=tests
 TESTS=$(wildcard $(TEST)/*.c)
@@ -16,7 +17,7 @@ OPT=-O0
 DEPFLAGS=-MP -MD
 
 # automatically add the -I onto each include directory
-CFLAGS=-Wall -Wextra -Werror -Wpedantic -g $(foreach D,$(INCDIRS),-I$(D)) $(OPT) $(DEPFLAGS) -fPIC
+CFLAGS=-Wall -Wextra -Werror -Wpedantic -g $(foreach D,$(INCDIRS),-I$(D)) $(OPT) $(DEPFLAGS) -fPIC -fprofile-arcs -ftest-coverage
 
 # for-style iteration (foreach) and regular expression completions (wildcard)
 CFILES=$(foreach D,$(CODEDIRS),$(wildcard $(D)/*.c))
@@ -28,7 +29,7 @@ DEPFILES=$(patsubst %.c,%.d,$(CFILES))
 all: $(BINARY)
 
 $(BINARY): $(OBJECTS)
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ -lgcov
 
 # only want the .c file dependency here, thus $< instead of $^.
 
@@ -36,7 +37,9 @@ $(BINARY): $(OBJECTS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -rf $(BINARY) $(OBJECTS) $(DEPFILES) $(TESTBINS) $(LIBDIR)
+	rm -rf $(BINARY) $(OBJECTS) $(DEPFILES) $(TESTBINS) $(LIBDIR) $(TESTCOVERAGEDIR) *.gcda *.gcno *.gcov coverage.info
+	find tests/bin/ -type f -name "*.gcda" -exec rm -f {} \;
+	find tests/bin/ -type f -name "*.gcno" -exec rm -f {} \;
 
 $(LIBRARY).a: $(OBJECTS)
 	ar rcs $@ $^
@@ -59,24 +62,20 @@ diff:
 
 $(TEST)/bin/%: $(TEST)/%.c src/matrix.c
 	mkdir -p $(TEST)/bin
-	$(CC) $(CFLAGS) -o $@ $^ -lcriterion
+	$(CC) $(CFLAGS) -o $@ $^ -lcriterion --coverage
 
 test: $(TESTBINS)
 	for test in $(TESTBINS) ; do ./$$test ; done
 
 # New target for coverage
-test_coverage: COVERAGE=1
-test_coverage: clean $(TESTBINS)
-        mkdir -p test_coverage/
-        $(CC) $(CFLAGS) -o test_coverage/test_coverage $(OBJECTS) $(TESTS) -lcriterion
-        ./test_coverage/test_coverage
-        lcov --capture --directory . --output-file test_coverage/coverage.info
-        lcov --remove test_coverage/coverage.info '/usr/*' --output-file test_coverage/coverage.info
-        genhtml test_coverage/coverage.info --output-directory test_coverage/out/
-
+test_coverage:
+	mkdir -p test_coverage
+	lcov --capture --directory . --output-file test_coverage/coverage.info
+	lcov --remove test_coverage/coverage.info '/usr/*' --output-file test_coverage/coverage.info
+	genhtml test_coverage/coverage.info --output-directory test_coverage/report
 
 # include the dependencies
 -include $(DEPFILES)
 
 # add .PHONY so that the non-targetfile - rules work even if a file with the same name exists.
-.PHONY: all clean distribute diff test
+.PHONY: all clean distribute diff test test_coverage

@@ -139,8 +139,9 @@ double matrix_at(const matrix *mat, unsigned int i, unsigned int j) {
         fprintf(stderr, "Index out of bounds\n");
         exit(EXIT_FAILURE);
     }
-    return ((double*)mat->data)[i * mat->num_cols + j];
+        return ((double*)mat->data)[i * mat->num_cols + j];
 }
+
 
 matrix *matrix_slice(matrix *mat, Range row_range, Range col_range) {
     // Check if all rows are needed
@@ -158,6 +159,7 @@ matrix *matrix_slice(matrix *mat, Range row_range, Range col_range) {
     printf("matrix slice not successfully executed.");
     return NULL;   
 }
+
 
 matrix *matrix_submatrix(const matrix *mat, Range row_range, Range col_range) {
      // Check for negative indices for start

@@ -1,7 +1,31 @@
 #include <criterion/criterion.h>
 #include <criterion/logging.h>
+#include <criterion/redirect.h>
 #include <stdio.h>
 #include "../include/matrix.h"  // Replace with your actual matrix library header
+
+Test(matrix_operations, valid_index) {
+    // Create a matrix for testing
+    unsigned int num_rows = 3;
+    unsigned int num_cols = 3;
+    size_t element_size = sizeof(double);
+    matrix *mat = matrix_new(num_rows, num_cols, element_size);
+    
+    // Fill the matrix with some values for testing
+    double *data = (double *)mat->data;
+    for (unsigned int i = 0; i < num_rows; i++) {
+        for (unsigned int j = 0; j < num_cols; j++) {
+            data[i * num_cols + j] = (double)(i * num_cols + j);
+        }
+    }
+    
+    // Test valid indices
+    cr_assert_eq(matrix_at(mat, 0, 0), 0.0, "Value at (0, 0) is incorrect");
+    cr_assert_eq(matrix_at(mat, 1, 1), 4.0, "Value at (1, 1) is incorrect");
+    cr_assert_eq(matrix_at(mat, 2, 2), 8.0, "Value at (2, 2) is incorrect");
+
+    matrix_free(mat); // Free the allocated matrix
+}
 
 Test(matrix_operations, eqdim_same_dimensions) {
     unsigned int rows = 3, cols = 4;

@@ -3,7 +3,7 @@
 #include "../include/matrix.h"  
 
 // Test case for matrix allocation
-Test(matrix, new_3by4) {
+Test(matrix_init, new_3by4) {
     int rows = 3, cols = 4;
     matrix *mat = matrix_new(rows, cols, sizeof(double));
 
@@ -16,7 +16,50 @@ Test(matrix, new_3by4) {
     matrix_free(mat);  // Assuming this is your deallocation function
 }
 
-Test(matrix, square_matrix) {
+Test(matrix_init, random_values_within_range) {
+    unsigned int num_rows = 3;
+    unsigned int num_cols = 3;
+    double min = 0.0;
+    double max = 1.0;
+    size_t element_size = sizeof(double);
+
+    matrix *result = matrix_rand(num_rows, num_cols, min, max, element_size);
+
+    // Check if the matrix is not NULL
+    cr_assert_not_null(result, "matrix_rand() returned NULL");
+
+    // Check if the matrix dimensions are as expected
+    cr_assert_eq(result->num_rows, num_rows, "Unexpected number of rows");
+    cr_assert_eq(result->num_cols, num_cols, "Unexpected number of columns");
+
+    // Check if all elements are within the specified range
+    double *data = (double *)result->data;
+    for (int i = 0; i < (int)num_rows; i++) {
+        for (int j = 0; j < (int)num_cols; j++) {
+            cr_assert_geq(data[i * num_cols + j], min, "Value below the minimum range");
+            cr_assert_leq(data[i * num_cols + j], max, "Value above the maximum range");
+        }
+    }
+
+    matrix_free(result); // Free the allocated matrix
+}
+
+Test(matrix_init, invalid_allocation) {
+    // Test case for when allocation fails (out of memory)
+    unsigned int num_rows = 1000000; // An unrealistically large number
+    unsigned int num_cols = 1000000;
+    double min = 0.0;
+    double max = 1.0;
+    size_t element_size = sizeof(double);
+
+    matrix *result = matrix_rand(num_rows, num_cols, min, max, element_size);
+
+    // Check if the function returns NULL when allocation fails
+    cr_assert_null(result, "matrix_rand() did not return NULL for invalid allocation");
+}
+
+
+Test(matrix_init, square_matrix) {
     unsigned int size = 4;
     matrix *mat = matrix_sqr(size, sizeof(double));
 
@@ -28,7 +71,7 @@ Test(matrix, square_matrix) {
     matrix_free(mat);
 }
 
-Test(matrix, identity_matrix) {
+Test(matrix_init, identity_matrix) {
     unsigned int size = 4;
     double identity_element = 1.0;
     matrix *mat = matrix_eye(size, sizeof(double), &identity_element);
@@ -50,7 +93,7 @@ Test(matrix, identity_matrix) {
     matrix_free(mat);
 }
 
-Test(matrix, print) {
+Test(matrix_init, print) {
     matrix *mat = matrix_new(2, 2, sizeof(double));
     if (!mat) {
       cr_assert_fail("Matrix allocation failed");
@@ -72,7 +115,7 @@ Test(matrix, print) {
     matrix_free(mat);
 }
 
-Test(matrix_operations, transpose_square_matrix) {
+Test(matrix_init, transpose_square_matrix) {
     matrix *mat = matrix_new(2, 2, sizeof(double));
     double values[4] = {1.0, 2.0, 3.0, 4.0};
     memcpy(mat->data, values, 4 * sizeof(double));
@@ -87,7 +130,7 @@ Test(matrix_operations, transpose_square_matrix) {
     matrix_free(mat);
 }
 
-Test(matrix_operations, transpose_rectangular_matrix) {
+Test(matrix_init, transpose_rectangular_matrix) {
     matrix *mat = matrix_new(2, 4, sizeof(double));
     double values[8] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
     memcpy(mat->data, values, 8 * sizeof(double));
@@ -108,7 +151,7 @@ Test(matrix_operations, transpose_rectangular_matrix) {
     matrix_free(mat);
 }
 
-Test(matrix_operations, stackv_square_matrices) {
+Test(matrix_init, stackv_square_matrices) {
     matrix *mat1 = matrix_new(2, 2, sizeof(double));
     matrix *mat2 = matrix_new(2, 2, sizeof(double));
     double values1[4] = {1.0, 2.0, 3.0, 4.0};
@@ -128,7 +171,7 @@ Test(matrix_operations, stackv_square_matrices) {
 }
 
 
-Test(matrix_operations, stackv_rectangular_matrices) {
+Test(matrix_init, stackv_rectangular_matrices) {
     matrix *mat1 = matrix_new(2, 3, sizeof(double));
     matrix *mat2 = matrix_new(2, 3, sizeof(double));
     // Initialize matrices mat1 and mat2 with some values
@@ -148,7 +191,7 @@ Test(matrix_operations, stackv_rectangular_matrices) {
 }
 
 
-Test(matrix_operations, stackh_square_matrices) {
+Test(matrix_init, stackh_square_matrices) {
     matrix *mat1 = matrix_new(2, 2, sizeof(double));
     matrix *mat2 = matrix_new(2, 2, sizeof(double));
     double values1[4] = {1.0, 2.0, 3.0, 4.0};
@@ -167,7 +210,7 @@ Test(matrix_operations, stackh_square_matrices) {
     matrix_free(result);
 }
 
-Test(matrix_operations, stackh_rectangular_matrices) {
+Test(matrix_init, stackh_rectangular_matrices) {
     matrix *mat1 = matrix_new(3, 2, sizeof(double));
     matrix *mat2 = matrix_new(3, 2, sizeof(double));
     // Initialize matrices mat1 and mat2 with some values
@@ -187,7 +230,7 @@ Test(matrix_operations, stackh_rectangular_matrices) {
 
 
 // Test case for removing a row
-Test(matrix_math, row_remove_first) {
+Test(matrix_init, row_remove_first) {
     matrix *mat = matrix_new(3, 3, sizeof(double));
     cr_assert_not_null(mat, "Matrix allocation returned NULL");
 
@@ -212,7 +255,7 @@ Test(matrix_math, row_remove_first) {
     matrix_free(new_mat);
 }
 
-Test(matrix_math, row_remove_last) {
+Test(matrix_init, row_remove_last) {
 
     matrix *mat = matrix_new(3, 4, sizeof(double));
     cr_assert_not_null(mat, "Matrix allocation returned NULL");
@@ -238,7 +281,7 @@ Test(matrix_math, row_remove_last) {
     matrix_free(new_mat);
 }
 
-Test(matrix_math, col_remove_first) {
+Test(matrix_init, col_remove_first) {
 
     matrix *mat = matrix_new(3, 4, sizeof(double));
     cr_assert_not_null(mat, "Matrix allocation returned NULL");
@@ -265,7 +308,7 @@ Test(matrix_math, col_remove_first) {
 }
 
 
-Test(matrix_math, col_remove_last) {
+Test(matrix_init, col_remove_last) {
 
     matrix *mat = matrix_new(3, 4, sizeof(double));
     cr_assert_not_null(mat, "Matrix allocation returned NULL");

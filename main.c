@@ -24,7 +24,7 @@ int main() {
     matrix_print(mat);
 
     matrix_free(mat);
-
+    
     matrix *mat1 = matrix_rand(3, 4, 0.0, 10.0, sizeof(double));
     printf("\nSecond matrix of random doubles 3x4 with values from 0.0-10.0\n");
     matrix_print(mat1);
@@ -50,6 +50,7 @@ int main() {
     matrix_print(mat2);
 
     // Free the matrix memory
+    matrix_free(mat1);
     matrix_free(mat2);
 
     // Allocate 6x6 double identity matrix
@@ -149,11 +150,24 @@ int main() {
     printf("Memory address of original matrix: %p\n", (void*)mat_all);
     printf("Memory address of copied matrix: %p\n", (void*)mat_all_sliced);
 
+    matrix *mat_remove_row = matrix_row_rem(mat_all_sliced, 0);
+    printf("Matrix_slice with first row removed. Should be 4x4 matrix of 5's now.\n");
+    matrix_print(mat_remove_row);
+
+
+    matrix *mat4 = matrix_new(3, 3, sizeof(double));
+    double *data4 = (double *)mat4->data;
+    for (unsigned int i = 0; i < 9; i++) {
+        data4[i] = i + 1;
+    }
+    matrix *mat_remove_col = matrix_col_rem(mat4, 2);
+    printf("Mat4 with last column removed. Should be 3x2 matrix now.\n");
+    matrix_print(mat_remove_col);
+	
+    matrix_free(mat_remove_col);
     matrix_free(mat_all);
     matrix_free(mat_diag);
-    matrix_free(mat_all_sliced);
-
-
+    
     return 0;
 }
 

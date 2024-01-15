@@ -9,7 +9,6 @@ double matrix_rand_interval(double min, double max) {
     return min + d * (max - min);
 }
 
-
 matrix *matrix_new(unsigned int num_rows, unsigned int num_cols, size_t element_size) {
 
   matrix *mat = calloc(1, sizeof(matrix));
@@ -26,7 +25,6 @@ matrix *matrix_new(unsigned int num_rows, unsigned int num_cols, size_t element_
     free(mat);
     return NULL;
   }
-
 
   return mat;
 }
@@ -408,3 +406,61 @@ void matrix_row_addrow(matrix *mat, unsigned int row1_index, unsigned int row2_i
     }
 }
 
+matrix *matrix_row_rem(matrix *mat, unsigned int row) {
+    if (row >= mat->num_rows) {
+        fprintf(stderr, "Row index out of bounds\n");
+        return mat;
+    }
+
+    unsigned int new_rows = mat->num_rows - 1;
+    matrix *new_mat = matrix_new(new_rows, mat->num_cols, sizeof(double));
+    if (!new_mat) {
+        return mat; // Failed to allocate new matrix, return the original
+    }
+
+    double *new_data = (double *)new_mat->data;
+    double *old_data = (double *)mat->data;
+
+    for (unsigned int i = 0, new_i = 0; i < mat->num_rows; i++) {
+        if (i == row) { 
+            continue; // Skip the row to be removed
+        }
+        for (unsigned int j = 0; j < mat->num_cols; j++) {
+            new_data[new_i * mat->num_cols + j] = old_data[i * mat->num_cols + j];
+        }
+        new_i++;
+    }
+
+    matrix_free(mat); // Free the old matrix
+    return new_mat;   // Return the new matrix
+}
+
+
+matrix *matrix_col_rem(matrix *mat, unsigned int col) {
+    if (col >= mat->num_cols) {
+        fprintf(stderr, "Column index out of bounds\n");
+        return mat;
+    }
+
+    unsigned int new_cols = mat->num_cols - 1;
+    matrix *new_mat = matrix_new(mat->num_rows, new_cols, sizeof(double));
+    if (!new_mat) {
+        return mat; // Failed to allocate new matrix, return the original
+    }
+
+    double *new_data = (double *)new_mat->data;
+    double *old_data = (double *)mat->data;
+
+    for (unsigned int i = 0; i < mat->num_rows; i++) {
+    	for (unsigned int j = 0, new_j = 0; j < mat->num_cols; j++) {
+        	if (j == col) {
+            	    continue; // Skip the column to be removed
+        	}
+        	new_data[i * new_cols + new_j] = old_data[i * mat->num_cols + j];
+                new_j++;
+    	}
+    }
+
+    matrix_free(mat); // Free the old matrix
+    return new_mat;   // Return the new matrix
+}

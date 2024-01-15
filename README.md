@@ -125,4 +125,11 @@ int main() {
 }
 
 ```
+### Memory Leak Check
 
+Feel free to run the below valgrind command to check for any memory leaks
+
+```
+valgrind --leak-check=full ./main
+
+```

@@ -186,4 +186,107 @@ Test(matrix_operations, stackh_rectangular_matrices) {
 }
 
 
+// Test case for removing a row
+Test(matrix_math, row_remove_first) {
+    matrix *mat = matrix_new(3, 3, sizeof(double));
+    cr_assert_not_null(mat, "Matrix allocation returned NULL");
 
+    // Initialize matrix with some values
+    double *data = (double *)mat->data;
+    for (unsigned int i = 0; i < 9; i++) {
+        data[i] = i + 1; // 1 to 9
+    }
+
+    // Remove the first row
+    matrix *new_mat = matrix_row_rem(mat, 0);
+
+    // Verify the new matrix dimensions and contents
+    cr_assert_not_null(new_mat, "New matrix after row removal is NULL");
+    cr_assert_eq(new_mat->num_rows, 2, "New matrix should have 2 rows");
+    cr_assert_eq(new_mat->num_cols, 3, "Number of columns should remain unchanged");
+    double expected_values[6] = {4, 5, 6, 7, 8, 9};
+    for (unsigned int i = 0; i < 6; i++) {
+        cr_assert_eq(((double *)new_mat->data)[i], expected_values[i], "Element [%u] is incorrect after row removal", i);
+    }
+
+    matrix_free(new_mat);
+}
+
+Test(matrix_math, row_remove_last) {
+
+    matrix *mat = matrix_new(3, 4, sizeof(double));
+    cr_assert_not_null(mat, "Matrix allocation returned NULL");
+
+    // Initialize matrix with some values
+    double *data = (double *)mat->data;
+    for (unsigned int i = 0; i < 12; i++) {
+        data[i] = i + 1; // 1 to 12
+    }
+
+    // Remove the last row
+    matrix *new_mat = matrix_row_rem(mat, 2);
+
+    // Verify the new matrix dimensions and contents
+    cr_assert_not_null(new_mat, "New matrix after row removal is NULL");
+    cr_assert_eq(new_mat->num_rows, 2, "New matrix should have 2 rows");
+    cr_assert_eq(new_mat->num_cols, 4, "Number of columns should remain unchanged");
+    double expected_values[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+    for (unsigned int i = 0; i < 8; i++) {
+        cr_assert_eq(((double *)new_mat->data)[i], expected_values[i], "Element [%u] is incorrect after row removal", i);
+    }
+
+    matrix_free(new_mat);
+}
+
+Test(matrix_math, col_remove_first) {
+
+    matrix *mat = matrix_new(3, 4, sizeof(double));
+    cr_assert_not_null(mat, "Matrix allocation returned NULL");
+
+    // Initialize matrix with some values
+    double *data = (double *)mat->data;
+    for (unsigned int i = 0; i < 12; i++) {
+        data[i] = i + 1; // 1 to 12
+    }
+
+    // Remove the last row
+    matrix *new_mat = matrix_col_rem(mat, 0);
+
+    // Verify the new matrix dimensions and contents
+    cr_assert_not_null(new_mat, "New matrix after row removal is NULL");
+    cr_assert_eq(new_mat->num_rows, 3, "New matrix should have 3 rows");
+    cr_assert_eq(new_mat->num_cols, 3, "New matrix should have 3 colsumns");
+    double expected_values[9] = {2, 3, 4, 6, 7, 8, 10, 11, 12};
+    for (unsigned int i = 0; i < 9; i++) {
+        cr_assert_eq(((double *)new_mat->data)[i], expected_values[i], "Element [%u] is incorrect after column removal", i);
+    }
+
+    matrix_free(new_mat);
+}
+
+
+Test(matrix_math, col_remove_last) {
+
+    matrix *mat = matrix_new(3, 4, sizeof(double));
+    cr_assert_not_null(mat, "Matrix allocation returned NULL");
+
+    // Initialize matrix with some values
+    double *data = (double *)mat->data;
+    for (unsigned int i = 0; i < 12; i++) {
+        data[i] = i + 1; // 1 to 12
+    }
+
+    // Remove the last row
+    matrix *new_mat = matrix_col_rem(mat, 3);
+
+    // Verify the new matrix dimensions and contents
+    cr_assert_not_null(new_mat, "New matrix after row removal is NULL");
+    cr_assert_eq(new_mat->num_rows, 3, "New matrix should have 3 rows");
+    cr_assert_eq(new_mat->num_cols, 3, "New matrix should have 3 columns");
+    double expected_values[9] = {1, 2, 3, 5, 6, 7, 9, 10, 11};
+    for (unsigned int i = 0; i < 9; i++) {
+        cr_assert_eq(((double *)new_mat->data)[i], expected_values[i], "Element [%u] is incorrect after column removal: (double*)new_mat->data[i] = %lf and expected_value[i] = %lf", i, ((double*)new_mat->data)[i], expected_values[i]);
+    }
+
+    matrix_free(new_mat);
+}

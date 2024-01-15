@@ -258,6 +258,98 @@ matrix *matrix_copy(const matrix *src) {
     return copy;
 }
 
+void matrix_transpose(matrix *mat) {
+    if (mat == NULL) {
+        return; // Handle null matrix
+    }
+
+    // Create a new matrix to store the transpose
+    matrix *transposed = matrix_new(mat->num_cols, mat->num_rows, sizeof(double));
+    if (!transposed) {
+        return; // Handle memory allocation failure
+    }
+
+    // Transpose the data
+    for (unsigned int i = 0; i < mat->num_rows; ++i) {
+        for (unsigned int j = 0; j < mat->num_cols; ++j) {
+            ((double*)transposed->data)[j * mat->num_rows + i] = 
+                ((double*)mat->data)[i * mat->num_cols + j];
+        }
+    }
+
+    // Replace original matrix data with transposed data
+    free(mat->data);
+    mat->data = transposed->data;
+    mat->num_rows = transposed->num_rows;
+    mat->num_cols = transposed->num_cols;
+
+    // Free the transposed matrix structure without freeing its data
+    free(transposed);
+}
+
+matrix *matrix_stackv(const matrix *mat1, const matrix *mat2) {
+    if (mat1 == NULL || mat2 == NULL) {
+        return NULL; // Handle null matrices
+    }
+
+    // Check if both matrices have the same number of columns
+    if (mat1->num_cols != mat2->num_cols) {
+        fprintf(stderr, "Error: Matrices must have the same number of columns to stack.\n");
+        return NULL;
+    }
+
+    // Create a new matrix to store the stacked matrices
+    unsigned int new_rows = mat1->num_rows + mat2->num_rows;
+    matrix *stacked = matrix_new(new_rows, mat1->num_cols, sizeof(double));
+    if (!stacked) {
+        return NULL; // Handle memory allocation failure
+    }
+
+    // Copy data from mat1 into the first part of stacked
+    memcpy(stacked->data, mat1->data, mat1->num_rows * mat1->num_cols * sizeof(double));
+    
+    // Copy data from mat2 into the second part of stacked
+    memcpy((char*)stacked->data + mat1->num_rows * mat1->num_cols * sizeof(double), 
+           mat2->data, mat2->num_rows * mat2->num_cols * sizeof(double));
+
+    return stacked;
+}
+
+matrix *matrix_stackh(const matrix *mat1, const matrix *mat2) {
+    if (mat1 == NULL || mat2 == NULL) {
+        return NULL; // Handle null matrices
+    }
+
+    // Check if both matrices have the same number of rows
+    if (mat1->num_rows != mat2->num_rows) {
+        fprintf(stderr, "Error: Matrices must have the same number of rows to stack horizontally.\n");
+        return NULL;
+    }
+
+    // Create a new matrix to store the horizontally stacked matrices
+    unsigned int new_cols = mat1->num_cols + mat2->num_cols;
+    matrix *stacked = matrix_new(mat1->num_rows, new_cols, sizeof(double));
+    if (!stacked) {
+        return NULL; // Handle memory allocation failure
+    }
+
+    // Copy data from mat1 and mat2 into the stacked matrix
+    for (unsigned int i = 0; i < mat1->num_rows; ++i) {
+        // Copy data from mat1
+        memcpy((char*)stacked->data + i * new_cols * sizeof(double),
+            (char*)mat1->data + i * mat1->num_cols * sizeof(double),
+            mat1->num_cols * sizeof(double));
+
+
+        // Copy data from mat2
+        memcpy((char*)stacked->data + (i * new_cols + mat1->num_cols) * sizeof(double), 
+           (char*)mat2->data + i * mat2->num_cols * sizeof(double), 
+           mat2->num_cols * sizeof(double));
+    } 
+
+    return stacked;
+
+}
 
 /*Matrix math operations*/
 
@@ -292,4 +384,22 @@ void matrix_mult_r(matrix *mat, double value) {
 }
 
 
+void matrix_row_addrow(matrix *mat, unsigned int row1_index, unsigned int row2_index, unsigned int result_row_index) {
+    if (mat == NULL) {
+        return; // Handle null matrix
+    }
+
+    // Check if row indices are within the bounds of the matrix
+    if (row1_index >= mat->num_rows || row2_index >= mat->num_rows || result_row_index >= mat->num_rows) {
+        fprintf(stderr, "Error: Row index out of bounds.\n");
+        return;
+    }
+
+    // Add rows and store the result
+    for (unsigned int i = 0; i < mat->num_cols; ++i) {
+        ((double*)mat->data)[result_row_index * mat->num_cols + i] = 
+            ((double*)mat->data)[row1_index * mat->num_cols + i] + 
+            ((double*)mat->data)[row2_index * mat->num_cols + i];
+    }
+}
 

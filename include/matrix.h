@@ -15,6 +15,7 @@ typedef struct Range_s {
   int end;
 } Range;
 
+/******* Matrix Initialization Operations *******/
 matrix *matrix_new(unsigned int num_rows, unsigned int num_cols, size_t element_size);
 
 matrix *matrix_rand(unsigned int num_rows, 
@@ -44,7 +45,13 @@ matrix *matrix_copy(const matrix *src);
 void matrix_all_set(matrix *mat, const void *value, size_t value_size);
 void matrix_diag_set(matrix *mat, const void *value, size_t value_size);
 
-/*Matrix math operations*/
+void matrix_transpose(matrix *mat);
+matrix *matrix_stackv(const matrix *mat1, const matrix *mat2);
+matrix *matrix_stackh(const matrix *mat1, const matrix *mat2);
+
+
+/*******   Matrix math operations   *******/
+
 //multiply a row with a scalar
 void matrix_row_mult_r(matrix *mat, unsigned int row, double value);
 
@@ -54,6 +61,6 @@ void matrix_col_mult_r(matrix *mat, unsigned int col, double value);
 //multiply a matrix with a scalar (all rows and columns)
 void matrix_mult_r(matrix *mat, double value);
 
-
+void matrix_row_addrow(matrix *mat, unsigned int row1_index, unsigned int row2_index, unsigned int result_row_index);
 
 #endif //MATRIX_H

@@ -72,4 +72,118 @@ Test(matrix, print) {
     matrix_free(mat);
 }
 
+Test(matrix_operations, transpose_square_matrix) {
+    matrix *mat = matrix_new(2, 2, sizeof(double));
+    double values[4] = {1.0, 2.0, 3.0, 4.0};
+    memcpy(mat->data, values, 4 * sizeof(double));
+
+    matrix_transpose(mat);
+
+    cr_assert_eq(((double*)mat->data)[0], 1.0, "Incorrect value in transposed matrix");
+    cr_assert_eq(((double*)mat->data)[1], 3.0, "Incorrect value in transposed matrix");
+    cr_assert_eq(((double*)mat->data)[2], 2.0, "Incorrect value in transposed matrix");
+    cr_assert_eq(((double*)mat->data)[3], 4.0, "Incorrect value in transposed matrix");
+
+    matrix_free(mat);
+}
+
+Test(matrix_operations, transpose_rectangular_matrix) {
+    matrix *mat = matrix_new(2, 4, sizeof(double));
+    double values[8] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+    memcpy(mat->data, values, 8 * sizeof(double));
+
+    matrix_transpose(mat);
+
+    cr_assert_eq(mat->num_rows, 4, "Number of rows should be 3 after transpose");
+    cr_assert_eq(mat->num_cols, 2, "Number of columns should be 2 after transpose");
+    cr_assert_eq(((double*)mat->data)[0], 1.0, "Incorrect value in transposed matrix");
+    cr_assert_eq(((double*)mat->data)[1], 5.0, "Incorrect value in transposed matrix");
+    cr_assert_eq(((double*)mat->data)[2], 2.0, "Incorrect value in transposed matrix");
+    cr_assert_eq(((double*)mat->data)[3], 6.0, "Incorrect value in transposed matrix");
+    cr_assert_eq(((double*)mat->data)[4], 3.0, "Incorrect value in transposed matrix");
+    cr_assert_eq(((double*)mat->data)[5], 7.0, "Incorrect value in transposed matrix");
+    cr_assert_eq(((double*)mat->data)[6], 4.0, "Incorrect value in transposed matrix");
+    cr_assert_eq(((double*)mat->data)[7], 8.0, "Incorrect value in transposed matrix");
+
+    matrix_free(mat);
+}
+
+Test(matrix_operations, stackv_square_matrices) {
+    matrix *mat1 = matrix_new(2, 2, sizeof(double));
+    matrix *mat2 = matrix_new(2, 2, sizeof(double));
+    double values1[4] = {1.0, 2.0, 3.0, 4.0};
+    double values2[4] = {5.0, 6.0, 7.0, 8.0};
+    memcpy(mat1->data, values1, 4 * sizeof(double));
+    memcpy(mat2->data, values2, 4 * sizeof(double));
+
+    matrix *result = matrix_stackv(mat1, mat2);
+
+    cr_assert_not_null(result, "matrix_stackv returned NULL");
+    cr_assert_eq(result->num_rows, 4, "Stacked matrix should have 4 rows");
+    cr_assert_eq(result->num_cols, 2, "Stacked matrix should have 2 columns");
+
+    matrix_free(mat1);
+    matrix_free(mat2);
+    matrix_free(result);
+}
+
+
+Test(matrix_operations, stackv_rectangular_matrices) {
+    matrix *mat1 = matrix_new(2, 3, sizeof(double));
+    matrix *mat2 = matrix_new(2, 3, sizeof(double));
+    // Initialize matrices mat1 and mat2 with some values
+
+    matrix *result = matrix_stackv(mat1, mat2);
+
+    cr_assert_not_null(result, "matrix_stackv returned NULL");
+    cr_assert_eq(result->num_rows, 4, "Stacked matrix should have 4 rows");
+    cr_assert_eq(result->num_cols, 3, "Stacked matrix should have 3 columns");
+
+    // Optionally, add assertions to check the values in the stacked matrix
+   
+    matrix_free(mat1);
+    matrix_free(mat2);
+    matrix_free(result);
+
+}
+
+
+Test(matrix_operations, stackh_square_matrices) {
+    matrix *mat1 = matrix_new(2, 2, sizeof(double));
+    matrix *mat2 = matrix_new(2, 2, sizeof(double));
+    double values1[4] = {1.0, 2.0, 3.0, 4.0};
+    double values2[4] = {5.0, 6.0, 7.0, 8.0};
+    memcpy(mat1->data, values1, 4 * sizeof(double));
+    memcpy(mat2->data, values2, 4 * sizeof(double));
+
+    matrix *result = matrix_stackh(mat1, mat2);
+
+    cr_assert_not_null(result, "matrix_stackh returned NULL");
+    cr_assert_eq(result->num_rows, 2, "Stacked matrix should have 2 rows");
+    cr_assert_eq(result->num_cols, 4, "Stacked matrix should have 4 columns");
+
+    matrix_free(mat1);
+    matrix_free(mat2);
+    matrix_free(result);
+}
+
+Test(matrix_operations, stackh_rectangular_matrices) {
+    matrix *mat1 = matrix_new(3, 2, sizeof(double));
+    matrix *mat2 = matrix_new(3, 2, sizeof(double));
+    // Initialize matrices mat1 and mat2 with some values
+
+    matrix *result = matrix_stackh(mat1, mat2);
+
+    cr_assert_not_null(result, "matrix_stackh returned NULL");
+    cr_assert_eq(result->num_rows, 3, "Stacked matrix should have 3 rows");
+    cr_assert_eq(result->num_cols, 4, "Stacked matrix should have 4 columns");
+
+    // Optionally, add assertions to check the values in the stacked matrix
+    
+    matrix_free(mat1);
+    matrix_free(mat2);
+    matrix_free(result);
+}
+
+
 

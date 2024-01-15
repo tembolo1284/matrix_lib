@@ -177,6 +177,12 @@ int main() {
     printf("Mat6 should be the sum of the two previous 3x2 matrices.\n");
     matrix_print(mat6);
 
+
+    matrix *mat7 = matrix_subtract(mat6, mat5);
+    printf("Mat7 should be last matrix minus matrix above last one.\n");
+    matrix_print(mat7);
+   
+    matrix_free(mat7);
     matrix_free(mat5);
     matrix_free(mat6);
 	

@@ -526,3 +526,29 @@ matrix *matrix_add(const matrix *mat1, const matrix *mat2) {
     return result;
 }
 
+matrix *matrix_subtract(const matrix *mat1, const matrix *mat2) {
+    // Check if both matrices have the same dimensions
+    if (!matrix_eqdim(mat1, mat2)) {
+        fprintf(stderr, "Matrices dimensions do not match.\n");
+        return NULL;
+    }
+
+    // Create a new matrix to store the result
+    matrix *result = matrix_new(mat1->num_rows, mat1->num_cols, sizeof(double));
+    if (!result) {
+        return NULL; // Memory allocation failure
+    }
+
+    // Perform the addition
+    double *data1 = (double *)mat1->data;
+    double *data2 = (double *)mat2->data;
+    double *result_data = (double *)result->data;
+
+    for (unsigned int i = 0; i < mat1->num_rows; ++i) {
+        for (unsigned int j = 0; j < mat1->num_cols; ++j) {
+            result_data[i * mat1->num_cols + j] = data1[i * mat1->num_cols + j] - data2[i * mat1->num_cols + j];
+        }
+    }
+
+    return result;
+}

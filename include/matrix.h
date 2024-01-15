@@ -53,8 +53,8 @@ matrix *matrix_stackh(const matrix *mat1, const matrix *mat2);
 matrix *matrix_row_rem(matrix *mat, unsigned int row);
 matrix *matrix_col_rem(matrix *mat, unsigned int col);
 
-matrix *matrix_swap_rows(matrix *mat, unsigned int row1, unsigned int row2);
-matrix *matrix_swap_cols(matrix *mat, unsigned int col1, unsigned int col2);
+void matrix_swap_rows(matrix *mat, unsigned int row1, unsigned int row2);
+void matrix_swap_cols(matrix *mat, unsigned int col1, unsigned int col2);
 
 
 /******* Internal Structure Change Functions *******/
@@ -71,5 +71,11 @@ void matrix_col_mult_r(matrix *mat, unsigned int col, double value);
 void matrix_mult_r(matrix *mat, double value);
 
 void matrix_row_addrow(matrix *mat, unsigned int row1_index, unsigned int row2_index, unsigned int result_row_index);
+
+
+matrix *matrix_add(const matrix *mat1, const matrix *mat2);
+matrix *matrix_subtract(const matrix *mat1, const matrix *mat2);
+matrix *matrix_mult(const matrix *mat1, const matrix *mat2);
+
 
 #endif //MATRIX_H

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "../include/matrix.h"  // Replace with your actual matrix library header
 
-Test(matrix, eqdim_same_dimensions) {
+Test(matrix_operations, eqdim_same_dimensions) {
     unsigned int rows = 3, cols = 4;
     matrix *mat1 = matrix_new(rows, cols, sizeof(double));
     matrix *mat2 = matrix_new(rows, cols, sizeof(double));
@@ -18,7 +18,7 @@ Test(matrix, eqdim_same_dimensions) {
     matrix_free(mat2);
 }
 
-Test(matrix, eqdim_different_dimensions) {
+Test(matrix_operations, eqdim_different_dimensions) {
     unsigned int rows1 = 3, cols1 = 4;
     unsigned int rows2 = 4, cols2 = 3;
     matrix *mat1 = matrix_new(rows1, cols1, sizeof(double));
@@ -34,7 +34,7 @@ Test(matrix, eqdim_different_dimensions) {
     matrix_free(mat2);
 }
 
-Test(matrix, eq_within_tolerance) {
+Test(matrix_operations, eq_within_tolerance) {
     unsigned int rows = 2, cols = 2;
     matrix *mat1 = matrix_new(rows, cols, sizeof(double));
     matrix *mat2 = matrix_new(rows, cols, sizeof(double));
@@ -64,7 +64,7 @@ Test(matrix, eq_within_tolerance) {
     matrix_free(mat2);
 }
 
-Test(matrix, eq_outside_tolerance) {
+Test(matrix_operations, eq_outside_tolerance) {
     unsigned int rows = 2, cols = 2;
     matrix *mat1 = matrix_new(rows, cols, sizeof(double));
     matrix *mat2 = matrix_new(rows, cols, sizeof(double));
@@ -95,7 +95,7 @@ Test(matrix, eq_outside_tolerance) {
 }
 
 // Test for matrix_slice function for a single row
-Test(matrix, slice_single_row) {
+Test(matrix_operations, slice_single_row) {
     unsigned int rows = 3, cols = 4;
     matrix *mat = matrix_new(rows, cols, sizeof(double));
 
@@ -114,7 +114,7 @@ Test(matrix, slice_single_row) {
 }
 
 // Test for matrix_slice function for a single column
-Test(matrix, slice_single_column) {
+Test(matrix_operations, slice_single_column) {
     unsigned int rows = 3, cols = 4;
     matrix *mat = matrix_new(rows, cols, sizeof(double));
 
@@ -133,7 +133,7 @@ Test(matrix, slice_single_column) {
 }
 
 // Test for matrix_slice function for a range of rows and columns
-Test(matrix, slice_row_col_range) {
+Test(matrix_operations, slice_row_col_range) {
     unsigned int rows = 4, cols = 5;
     matrix *mat = matrix_new(rows, cols, sizeof(double));
 
@@ -151,7 +151,7 @@ Test(matrix, slice_row_col_range) {
     matrix_free(submatrix);
 }
 
-Test(matrix, slice_full_matrix) {
+Test(matrix_operations, slice_full_matrix) {
     unsigned int rows = 3, cols = 4;
     matrix *mat = matrix_new(rows, cols, sizeof(double));
 
@@ -168,7 +168,7 @@ Test(matrix, slice_full_matrix) {
 }
 
 
-Test(matrix, slice_all_rows_one_column) {
+Test(matrix_operations, slice_all_rows_one_column) {
     unsigned int rows = 3, cols = 4, col_num = 1;
     matrix *mat = matrix_new(rows, cols, sizeof(double));
 
@@ -185,7 +185,7 @@ Test(matrix, slice_all_rows_one_column) {
 }
 
 
-Test(matrix, slice_all_rows_range_of_columns) {
+Test(matrix_operations, slice_all_rows_range_of_columns) {
     unsigned int rows = 3, cols = 4;
     matrix *mat = matrix_new(rows, cols, sizeof(double));
 
@@ -202,7 +202,7 @@ Test(matrix, slice_all_rows_range_of_columns) {
 }
 
 
-Test(matrix, slice_range_of_rows_one_column) {
+Test(matrix_operations, slice_range_of_rows_one_column) {
     unsigned int rows = 4, cols = 5, col_num = 2;
     matrix *mat = matrix_new(rows, cols, sizeof(double));
 
@@ -217,7 +217,7 @@ Test(matrix, slice_range_of_rows_one_column) {
     matrix_free(sliced);
 }
 
-Test(matrix, slice_range_of_rows_and_columns) {
+Test(matrix_operations, slice_range_of_rows_and_columns) {
     unsigned int rows = 4, cols = 5;
     matrix *mat = matrix_new(rows, cols, sizeof(double));
 
@@ -233,7 +233,7 @@ Test(matrix, slice_range_of_rows_and_columns) {
     matrix_free(sliced);
 }
 
-Test(matrix, slice_one_row_one_column) {
+Test(matrix_operations, slice_one_row_one_column) {
     unsigned int rows = 3, cols = 4, row_num = 1, col_num = 2;
     matrix *mat = matrix_new(rows, cols, sizeof(double));
 
@@ -249,7 +249,7 @@ Test(matrix, slice_one_row_one_column) {
     matrix_free(sliced);
 }
 
-Test(matrix, slice_one_row_range_of_columns) {
+Test(matrix_operations, slice_one_row_range_of_columns) {
     unsigned int rows = 3, cols = 4, row_num = 1;
     matrix *mat = matrix_new(rows, cols, sizeof(double));
 
@@ -264,5 +264,80 @@ Test(matrix, slice_one_row_range_of_columns) {
     matrix_free(mat);
     matrix_free(sliced);
 }
+
+Test(matrix_operations, swap_rows_square_matrix) {
+    matrix *mat = matrix_new(3, 3, sizeof(double));
+    cr_assert_not_null(mat, "Matrix allocation returned NULL");
+
+    // Initialize matrix with some values
+    double values[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    memcpy(mat->data, values, 9 * sizeof(double));
+
+    matrix_swap_rows(mat, 0, 2); // Swap first and last rows
+
+    // Verify that rows are swapped
+    cr_assert_eq(((double*)mat->data)[0], 7, "First element of first row is incorrect after swap");
+    cr_assert_eq(((double*)mat->data)[8], 3, "Last element of last row is incorrect after swap");
+
+    matrix_free(mat);
+}
+
+// Test case for swapping two rows in a rectangular matrix
+Test(matrix_operations, swap_rows_rectangular_matrix) {
+    matrix *mat = matrix_new(4, 2, sizeof(double));
+    cr_assert_not_null(mat, "Matrix allocation returned NULL");
+
+    // Initialize matrix with some values
+    double values[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+    memcpy(mat->data, values, 8 * sizeof(double));
+
+    matrix_swap_rows(mat, 1, 3); // Swap second and fourth rows
+
+    // Verify that rows are swapped
+    cr_assert_eq(((double*)mat->data)[2], 7, "First elem of second row is incorrect after swap");
+    cr_assert_eq(((double*)mat->data)[7], 4, "Last elem of fourth row is incorrect after swap");
+
+    matrix_free(mat);
+}
+
+// Test case for swapping two columns in a square matrix
+Test(matrix_operations, swap_cols_square_matrix) {
+    matrix *mat = matrix_new(3, 3, sizeof(double));
+    cr_assert_not_null(mat, "Matrix allocation returned NULL");
+
+    // Initialize matrix with some values
+    double values[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    memcpy(mat->data, values, 9 * sizeof(double));
+
+    matrix_swap_cols(mat, 0, 2); // Swap first and last columns
+
+    // Verify that columns are swapped
+    cr_assert_eq(((double*)mat->data)[0], 3, "First elem of first column is incorrect after swap");
+    cr_assert_eq(((double*)mat->data)[8], 7, "Last elem of last column is incorrect after swap");
+
+    matrix_free(mat);
+
+}
+
+// Test case for swapping two columns in a rectangular matrix
+Test(matrix_operations, swap_cols_rectangular_matrix) {
+    matrix *mat = matrix_new(2, 4, sizeof(double));
+    cr_assert_not_null(mat, "Matrix allocation returned NULL");
+
+    // Initialize matrix with some values
+    double values[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+    memcpy(mat->data, values, 8 * sizeof(double));
+
+    matrix_swap_cols(mat, 1, 3); // Swap second and fourth columns
+
+    // Verify that columns are swapped
+    cr_assert_eq(((double*)mat->data)[1], 4, "Second elem of first row is incorrect after swap");
+    cr_assert_eq(((double*)mat->data)[7], 6, "Last elem of second row is incorrect after swap");
+
+    matrix_free(mat);
+
+}
+
+
 
 

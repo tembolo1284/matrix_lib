@@ -139,3 +139,61 @@ Test(matrix_math, add_rows_result_invalid_indices) {
 
     matrix_free(mat);
 }
+
+Test(matrix_math, add_two_square_matrices) {
+    // Create two 3x3 matrices
+    matrix *mat1 = matrix_new(3, 3, sizeof(double));
+    matrix *mat2 = matrix_new(3, 3, sizeof(double));
+    cr_assert_not_null(mat1, "Matrix 1 allocation returned NULL");
+    cr_assert_not_null(mat2, "Matrix 2 allocation returned NULL");
+
+    // Initialize matrices with values
+    double values1[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    double values2[9] = {9, 8, 7, 6, 5, 4, 3, 2, 1};
+    memcpy(mat1->data, values1, 9 * sizeof(double));
+    memcpy(mat2->data, values2, 9 * sizeof(double));
+
+    // Perform matrix addition
+    matrix *result = matrix_add(mat1, mat2);
+
+    // Check if the result matrix is correct
+    double *result_data = (double *) result->data;
+    for (int i = 0; i < 9; i++) {
+        cr_assert_eq(result_data[i], 10, "Element at index %d is not correct", i);
+    }
+
+    matrix_free(mat1);
+    matrix_free(mat2);
+    matrix_free(result);
+}
+
+
+Test(matrix_math, add_two_rectangular_matrices) {
+    // Create two 2x4 matrices
+    matrix *mat1 = matrix_new(2, 4, sizeof(double));
+    matrix *mat2 = matrix_new(2, 4, sizeof(double));
+    cr_assert_not_null(mat1, "Matrix 1 allocation returned NULL");
+    cr_assert_not_null(mat2, "Matrix 2 allocation returned NULL");
+
+    // Initialize matrices with values
+    double values1[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+    double values2[8] = {8, 7, 6, 5, 4, 3, 2, 1};
+    memcpy(mat1->data, values1, 8 * sizeof(double));
+    memcpy(mat2->data, values2, 8 * sizeof(double));
+
+    // Perform matrix addition
+    matrix *result = matrix_add(mat1, mat2);
+
+    // Check if the result matrix is correct
+    double *result_data = (double *) result->data;
+    double expected_values[8] = {9, 9, 9, 9, 9, 9, 9, 9};
+    for (int i = 0; i < 8; i++) {
+        cr_assert_eq(result_data[i], expected_values[i], "Element at index %d is not correct", i);
+    }
+
+    matrix_free(mat1);
+    matrix_free(mat2);
+    matrix_free(result);
+}
+
+

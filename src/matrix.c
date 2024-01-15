@@ -464,3 +464,65 @@ matrix *matrix_col_rem(matrix *mat, unsigned int col) {
     matrix_free(mat); // Free the old matrix
     return new_mat;   // Return the new matrix
 }
+
+void matrix_swap_rows(matrix *mat, unsigned int row1, unsigned int row2) {
+    if (!mat || row1 >= mat->num_rows || row2 >= mat->num_rows) {
+        // Handle invalid input
+        fprintf(stderr, "Invalid input for matrix row swap.\n");
+        return;
+    }
+
+    double *data = (double *)mat->data;
+    for (unsigned int i = 0; i < mat->num_cols; i++) {
+        double temp = data[row1 * mat->num_cols + i];
+        data[row1 * mat->num_cols + i] = data[row2 * mat->num_cols + i];
+        data[row2 * mat->num_cols + i] = temp;
+    }
+
+}
+
+void matrix_swap_cols(matrix *mat, unsigned int col1, unsigned int col2) {
+    if (!mat || col1 >= mat->num_cols || col2 >= mat->num_cols) {
+        // Handle invalid input
+        fprintf(stderr, "Invalid input for matrix column swap.\n");
+        return;
+    }
+
+    double *data = (double *)mat->data;
+    for (unsigned int i = 0; i < mat->num_rows; i++) {
+        double temp = data[i * mat->num_cols + col1];
+        data[i * mat->num_cols + col1] = data[i * mat->num_cols + col2];
+        data[i * mat->num_cols + col2] = temp;
+    }
+
+}
+
+
+
+matrix *matrix_add(const matrix *mat1, const matrix *mat2) {
+    // Check if both matrices have the same dimensions
+    if (!matrix_eqdim(mat1, mat2)) {
+        fprintf(stderr, "Matrices dimensions do not match.\n");
+        return NULL;
+    }
+
+    // Create a new matrix to store the result
+    matrix *result = matrix_new(mat1->num_rows, mat1->num_cols, sizeof(double));
+    if (!result) {
+        return NULL; // Memory allocation failure
+    }
+
+    // Perform the addition
+    double *data1 = (double *)mat1->data;
+    double *data2 = (double *)mat2->data;
+    double *result_data = (double *)result->data;
+
+    for (unsigned int i = 0; i < mat1->num_rows; ++i) {
+        for (unsigned int j = 0; j < mat1->num_cols; ++j) {
+            result_data[i * mat1->num_cols + j] = data1[i * mat1->num_cols + j] + data2[i * mat1->num_cols + j];
+        }
+    }
+
+    return result;
+}
+

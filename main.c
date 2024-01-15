@@ -163,6 +163,22 @@ int main() {
     matrix *mat_remove_col = matrix_col_rem(mat4, 2);
     printf("Mat4 with last column removed. Should be 3x2 matrix now.\n");
     matrix_print(mat_remove_col);
+
+    matrix *mat5 = matrix_new(3, 2, sizeof(double));
+    double *data5 = (double *)mat5->data;
+    for (unsigned int i = 0; i < 6; i++) {
+        data5[i] = i + 2.25;
+    }
+
+    printf("Mat5 should be a 3x2 matrix of even numbers\n");
+    matrix_print(mat5);
+
+    matrix *mat6 = matrix_add(mat_remove_col, mat5);
+    printf("Mat6 should be the sum of the two previous 3x2 matrices.\n");
+    matrix_print(mat6);
+
+    matrix_free(mat5);
+    matrix_free(mat6);
 	
     matrix_free(mat_remove_col);
     matrix_free(mat_all);

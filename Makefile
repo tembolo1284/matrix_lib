@@ -64,6 +64,17 @@ $(TEST)/bin/%: $(TEST)/%.c src/matrix.c
 test: $(TESTBINS)
 	for test in $(TESTBINS) ; do ./$$test ; done
 
+# New target for coverage
+test_coverage: COVERAGE=1
+test_coverage: clean $(TESTBINS)
+        mkdir -p test_coverage/
+        $(CC) $(CFLAGS) -o test_coverage/test_coverage $(OBJECTS) $(TESTS) -lcriterion
+        ./test_coverage/test_coverage
+        lcov --capture --directory . --output-file test_coverage/coverage.info
+        lcov --remove test_coverage/coverage.info '/usr/*' --output-file test_coverage/coverage.info
+        genhtml test_coverage/coverage.info --output-directory test_coverage/out/
+
+
 # include the dependencies
 -include $(DEPFILES)
 

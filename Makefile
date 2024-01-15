@@ -1,4 +1,6 @@
 BINARY=main
+LIBRARY=libmatrix
+LIBDIR=./library
 
 TEST=tests
 TESTS=$(wildcard $(TEST)/*.c)
@@ -14,7 +16,7 @@ OPT=-O0
 DEPFLAGS=-MP -MD
 
 # automatically add the -I onto each include directory
-CFLAGS=-Wall -Wextra -g $(foreach D,$(INCDIRS),-I$(D)) $(OPT) $(DEPFLAGS)
+CFLAGS=-Wall -Wextra -Werror -Wpedantic -g $(foreach D,$(INCDIRS),-I$(D)) $(OPT) $(DEPFLAGS) -fPIC
 
 # for-style iteration (foreach) and regular expression completions (wildcard)
 CFILES=$(foreach D,$(CODEDIRS),$(wildcard $(D)/*.c))
@@ -34,10 +36,18 @@ $(BINARY): $(OBJECTS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -rf $(BINARY) $(OBJECTS) $(DEPFILES) $(TESTBINS)
+	rm -rf $(BINARY) $(OBJECTS) $(DEPFILES) $(TESTBINS) $(LIBDIR)
+
+$(LIBRARY).a: $(OBJECTS)
+	ar rcs $@ $^
+
+$(LIBRARY).so: $(OBJECTS)
+	$(CC) -shared -o $@ $^
 
 # shell commands are a set of keystrokes away
-distribute: clean
+distribute: clean $(LIBRARY).a $(LIBRARY).so
+	mkdir -p $(LIBDIR)
+	mv $(LIBRARY).a $(LIBRARY).so $(LIBDIR)
 	tar zcvf dist.tgz *
 
 # @ silences the printing of the command

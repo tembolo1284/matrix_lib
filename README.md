@@ -7,10 +7,22 @@ array[i * m + j] represents the equivalent access but in a one-dimensional array
 
 This method of storing matrix data in a linear array and accessing it as if it were a two-dimensional array is common in C because C does not natively support true multi-dimensional arrays, only arrays of arrays. This approach also tends to be more cache-friendly, as it stores the matrix elements in contiguous memory locations, which can improve performance due to better utilization of the CPU cache. This is how the matrix library has been implemented here.
 
-
 # Matrix Library
 
-This matrix library provides a set of functions for creating, manipulating, and comparing matrices in C. Below is the documentation for the currently implemented functions.
+This matrix library in C is designed for efficient handling and operations of matrices, storing them in a one-dimensional array while giving the illusion of a two-dimensional matrix. This approach, `data[i][j] <=> array[i * m + j]`, is typical in C, promoting cache-friendliness and performance. 
+
+
+## Installation
+
+- Clone/download the repository.
+- Include the `matrix.h` in your C program.
+- Compile your program with `matrix.c`.  For example `gcc -o your_program your_program.c src/matrix.c`.
+
+## Features
+- Matrix creation, manipulation, and comparison.
+- Support for square, identity, and random matrices.
+- Matrix arithmetic operations including addition, multiplication, and transposition.
+- Functions for checking matrix dimensions and equality with tolerance.
 
 ## Functions
 
@@ -78,7 +90,39 @@ This matrix library provides a set of functions for creating, manipulating, and 
   - `tolerance`: The tolerance level for element-wise comparison.
 - **Returns**: 1 if matrices are equal within the given tolerance, 0 otherwise.
 
-## Usage
+### `matrix_transpose`
+- **Description**: Transposes the given matrix, swapping its rows and columns.
+- **Parameters**:
+  - `mat`: Pointer to the matrix to be transposed.
+- **Returns**: Nothing.  The function transposes the matrix in place, modifying the original matrix.
 
-To use this library, include `matrix.h` in your C program and link against the implementation of these functions.
+
+### `matrix_stackv`
+- **Description**: Stacks two matrices vertically, assuming they have the same number of columns.
+- **Parameters**:
+  - `mat1`: Pointer to the first matrix.
+  - `mat2`: Pointer to the second matrix.
+- **Returns**: A new matrix that is the result of stacking `mat1` over `mat2`.
+
+
+### `matrix_stackh`
+- **Description**: Stacks two matrices horizontally, assuming they have the same number of rows.
+- **Parameters**:
+  - `mat1`: Pointer to the first matrix.
+  - `mat2`: Pointer to the second matrix.
+- **Returns**: A new matrix that is the result of stacking `mat1` next to `mat2` on the right side.
+
+### Example
+
+```
+#include "matrix.h"
+
+int main() {
+  matrix *mat = matrix_new(3, 3, sizeof(double));
+  // Perform operations...
+  matrix_free(mat);
+  return 0;
+}
+
+```
 

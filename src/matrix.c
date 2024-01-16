@@ -417,7 +417,7 @@ matrix *matrix_row_rem(matrix *mat, unsigned int row) {
     unsigned int new_rows = mat->num_rows - 1;
     matrix *new_mat = matrix_new(new_rows, mat->num_cols, sizeof(double));
     if (!new_mat) {
-        return mat; // Failed to allocate new matrix, return the original
+        return NULL; // Failed to allocate new matrix, return the original
     }
 
     double *new_data = (double *)new_mat->data;
@@ -447,7 +447,7 @@ matrix *matrix_col_rem(matrix *mat, unsigned int col) {
     unsigned int new_cols = mat->num_cols - 1;
     matrix *new_mat = matrix_new(mat->num_rows, new_cols, sizeof(double));
     if (!new_mat) {
-        return mat; // Failed to allocate new matrix, return the original
+        return NULL; // Failed to allocate new matrix, return the original
     }
 
     double *new_data = (double *)new_mat->data;

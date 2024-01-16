@@ -71,7 +71,7 @@ int main() {
     Range row_range = { 1, 3 }; // Rows 2 to 3
     Range col_range = { 2, 4 }; // Columns 3 to 4
 
-
+    
     matrix *mat0 = matrix_new(3, 5, sizeof(double));
     if (!mat) return 1;
   
@@ -150,11 +150,12 @@ int main() {
     printf("Memory address of original matrix: %p\n", (void*)mat_all);
     printf("Memory address of copied matrix: %p\n", (void*)mat_all_sliced);
 
+    
     matrix *mat_remove_row = matrix_row_rem(mat_all_sliced, 0);
     printf("Matrix_slice with first row removed. Should be 4x4 matrix of 5's now.\n");
     matrix_print(mat_remove_row);
 
-
+    
     matrix *mat4 = matrix_new(3, 3, sizeof(double));
     double *data4 = (double *)mat4->data;
     for (unsigned int i = 0; i < 9; i++) {
@@ -181,15 +182,17 @@ int main() {
     matrix *mat7 = matrix_subtract(mat6, mat5);
     printf("Mat7 should be last matrix minus matrix above last one.\n");
     matrix_print(mat7);
-   
+  
+    
     matrix_free(mat7);
     matrix_free(mat5);
     matrix_free(mat6);
-	
+
+    
+    matrix_free(mat_remove_row);
     matrix_free(mat_remove_col);
     matrix_free(mat_all);
     matrix_free(mat_diag);
-    
     return 0;
 }
 

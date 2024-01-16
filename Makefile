@@ -38,8 +38,8 @@ $(BINARY): $(OBJECTS)
 
 clean:
 	rm -rf $(BINARY) $(OBJECTS) $(DEPFILES) $(TESTBINS) $(LIBDIR) $(TESTCOVERAGEDIR) *.gcda *.gcno *.gcov coverage.info
-	find tests/bin/ -type f -name "*.gcda" -exec rm -f {} \;
-	find tests/bin/ -type f -name "*.gcno" -exec rm -f {} \;
+	rm -rf tests/bin/
+	rm -rf src/*.gcda src/*.gcno
 
 $(LIBRARY).a: $(OBJECTS)
 	ar rcs $@ $^

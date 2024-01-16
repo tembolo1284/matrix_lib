@@ -224,3 +224,54 @@ Test(matrix_math, subtract_two_square_matrices) {
     matrix_free(mat2);
     matrix_free(result);
 }
+
+
+// Test case for matrix multiplication with square matrices
+Test(matrix_math, matrix_mult_square_matrices) {
+    matrix *mat1 = matrix_new(2, 2, sizeof(double));
+    matrix *mat2 = matrix_new(2, 2, sizeof(double));
+
+    double values1[4] = {1.0, 2.0, 3.0, 4.0};
+    double values2[4] = {5.0, 6.0, 7.0, 8.0};
+
+    memcpy(mat1->data, values1, 4 * sizeof(double));
+    memcpy(mat2->data, values2, 4 * sizeof(double));
+
+    matrix *result = matrix_mult(mat1, mat2);
+
+    double *result_data = (double *)result->data;
+    double expected_values[4] = {19.0, 22.0, 43.0, 50.0};
+
+    for (int i = 0; i < 4; i++) {
+        cr_assert_eq(result_data[i], expected_values[i], "Element at index %d is not correct", i);
+    }
+
+    matrix_free(mat1);
+    matrix_free(mat2);
+    matrix_free(result);
+}
+
+// Test case for matrix multiplication with rectangular matrices
+Test(matrix_math, matrix_mult_rectangular_matrices) {
+    matrix *mat1 = matrix_new(2, 3, sizeof(double));
+    matrix *mat2 = matrix_new(3, 2, sizeof(double));
+
+    double values1[6] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+    double values2[6] = {7.0, 8.0, 9.0, 10.0, 11.0, 12.0};
+
+    memcpy(mat1->data, values1, 6 * sizeof(double));
+    memcpy(mat2->data, values2, 6 * sizeof(double));
+
+    matrix *result = matrix_mult(mat1, mat2);
+
+    double *result_data = (double *)result->data;
+    double expected_values[4] = {58.0, 64.0, 139.0, 154.0};
+
+    for (int i = 0; i < 4; i++) {
+        cr_assert_eq(result_data[i], expected_values[i], "Element at index %d is not correct", i);
+    }
+
+    matrix_free(mat1);
+    matrix_free(mat2);
+    matrix_free(result);
+}

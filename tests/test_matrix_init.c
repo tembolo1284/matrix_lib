@@ -1,5 +1,6 @@
 #include <criterion/criterion.h>
 #include <criterion/logging.h>
+#include <stdio.h>
 #include "../include/matrix.h"  
 
 // Test case for matrix allocation
@@ -15,6 +16,77 @@ Test(matrix_init, new_3by4) {
 
     matrix_free(mat);  // Assuming this is your deallocation function
 }
+
+// Test case 1: Set all elements of a matrix to 0
+Test(matrix_init, all_set_to_zero) {
+    // Create a matrix for testing
+    unsigned int num_rows = 3;
+    unsigned int num_cols = 3;
+    size_t element_size = sizeof(double);
+    matrix *mat = matrix_new(num_rows, num_cols, element_size);
+
+    // Set all elements to 0
+    double zero = 0.0;
+    matrix_all_set(mat, &zero, sizeof(double));
+
+    // Check if all elements are 0
+    for (unsigned int i = 0; i < num_rows; ++i) {
+        for (unsigned int j = 0; j < num_cols; ++j) {
+            cr_assert_eq(matrix_at(mat, i, j), 0.0);
+        }
+    }
+
+    matrix_free(mat); // Free the allocated matrix
+}
+
+// Test case 2: Set all elements of a matrix to a specific value
+Test(matrix_init, all_set_to_value) {
+    // Create a matrix for testing
+    unsigned int num_rows = 2;
+    unsigned int num_cols = 2;
+    size_t element_size = sizeof(double);
+    matrix *mat = matrix_new(num_rows, num_cols, element_size);
+
+    // Set all elements to a specific value (e.g., 42)
+    double value = 42.0;
+    matrix_all_set(mat, &value, sizeof(double));
+    // Check if all elements are equal to the specified value
+    for (unsigned int i = 0; i < num_rows; ++i) {
+        for (unsigned int j = 0; j < num_cols; ++j) {
+            cr_assert_eq(matrix_at(mat, i, j), 42.0);
+        }
+    }
+
+    matrix_free(mat); // Free the allocated matrix
+}
+
+Test(matrix_operations, diag_set) {
+    // Create a matrix for testing
+    unsigned int num_rows = 3;
+    unsigned int num_cols = 3;
+    size_t element_size = sizeof(double);
+    matrix *mat = matrix_new(num_rows, num_cols, element_size);
+
+    // Set the diagonal elements to a specific value (e.g., 7.0)
+    double value = 7.0;
+    matrix_diag_set(mat, &value, sizeof(double));
+
+    // Check if the diagonal elements are equal to the specified value
+    for (unsigned int i = 0; i < num_rows; ++i) {
+        for (unsigned int j = 0; j < num_cols; ++j) {
+            if (i == j) {
+                cr_assert_eq(matrix_at(mat, i, j), 7.0);
+            } else {
+                // Check that non-diagonal elements are not modified
+                cr_assert_neq(matrix_at(mat, i, j), 7.0);
+            }
+        }
+    }
+
+    matrix_free(mat); // Free the allocated matrix
+}
+
+
 
 Test(matrix_init, random_values_within_range) {
     unsigned int num_rows = 3;

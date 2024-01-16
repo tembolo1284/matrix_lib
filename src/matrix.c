@@ -554,3 +554,38 @@ matrix *matrix_subtract(const matrix *mat1, const matrix *mat2) {
 
     return result;
 }
+
+
+matrix *matrix_mult(const matrix *mat1, const matrix *mat2) {
+    // Check if the number of columns in mat1 equals the number of rows in mat2
+    if (mat1->num_cols != mat2->num_rows) {
+        fprintf(stderr, "Matrix dimensions are not compatible for multiplication.\n");
+        return NULL;
+    }
+
+    // Create a new matrix to store the result
+    matrix *result = matrix_new(mat1->num_rows, mat2->num_cols, sizeof(double));
+    if (!result) {
+        return NULL; // Memory allocation failure
+    }
+
+    // Perform matrix multiplication
+    double *data1 = (double *)mat1->data;
+    double *data2 = (double *)mat2->data;
+    double *result_data = (double *)result->data;
+
+    for (unsigned int i = 0; i < mat1->num_rows; ++i) {
+        for (unsigned int j = 0; j < mat2->num_cols; ++j) {
+            double sum = 0.0;
+            for (unsigned int k = 0; k < mat1->num_cols; ++k) {
+                sum += data1[i * mat1->num_cols + k] * data2[k * mat2->num_cols + j];
+            }
+            result_data[i * mat2->num_cols + j] = sum;
+        }
+    }
+
+    return result;
+}
+
+
+

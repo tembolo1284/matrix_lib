@@ -183,10 +183,23 @@ int main() {
     printf("Mat7 should be last matrix minus matrix above last one.\n");
     matrix_print(mat7);
   
+
+
     
-    matrix_free(mat7);
+    matrix *mat8 = matrix_row_rem(mat7, 2);
+    matrix_print(mat8);
+
+    
+    matrix *ref = matrix_ref(mat8);
+
+    printf("Mat8 in row echelon form is below:\n");
+    matrix_print(ref);
+
+    matrix_free(ref);    
+    //matrix_free(mat7);
     matrix_free(mat5);
     matrix_free(mat6);
+    matrix_free(mat8);
 
     
     matrix_free(mat_remove_row);

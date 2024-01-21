@@ -383,8 +383,7 @@ void matrix_mult_r(matrix *mat, double value) {
     }
 }
 
-
-void matrix_row_addrow(matrix *mat, unsigned int row1_index, unsigned int row2_index, unsigned int result_row_index) {
+void matrix_row_addrow(matrix *mat, unsigned int row1_index, unsigned int row2_index, double factor) {
     if (mat == NULL) {
         return; // Handle null matrix
     }
@@ -395,18 +394,14 @@ void matrix_row_addrow(matrix *mat, unsigned int row1_index, unsigned int row2_i
         return;
     }
 
-    if (result_row_index >= mat->num_rows) {
-        fprintf(stderr, "Error: Your result row selection index is out of bounds.\n");
-        return;
-    }
-
-    // Add rows and store the result
+    // Perform the row addition with the specified factor
     for (unsigned int i = 0; i < mat->num_cols; ++i) {
-        ((double*)mat->data)[result_row_index * mat->num_cols + i] = 
-            ((double*)mat->data)[row1_index * mat->num_cols + i] + 
-            ((double*)mat->data)[row2_index * mat->num_cols + i];
+        double row1_value = ((double*)mat->data)[row1_index * mat->num_cols + i];
+        double row2_value = ((double*)mat->data)[row2_index * mat->num_cols + i];
+        ((double*)mat->data)[row2_index * mat->num_cols + i] = row2_value + (factor * row1_value);
     }
 }
+
 
 matrix *matrix_row_rem(matrix *mat, unsigned int row) {
     if (row >= mat->num_rows) {
@@ -588,4 +583,58 @@ matrix *matrix_mult(const matrix *mat1, const matrix *mat2) {
 }
 
 
+int matrix_pivotidx(matrix *mat, unsigned int col, unsigned int row) {
+    int i, maxi;
+    double maxcol;
+    double max = fabs(matrix_at(mat, row, col));
+    maxi = row;
+    for (i = row; i <(int)(mat->num_rows); i++) {
+        maxcol = fabs(matrix_at(mat, i, col));
+        if (maxcol > max) {
+            max = maxcol;
+            maxi = i;
+        }
+    }
+    return (max < 1e-10) ? -1 : maxi; // You can adjust the tolerance as needed
+}
+
+
+matrix *matrix_ref(matrix *mat) {
+    matrix *result = matrix_copy(mat);
+    unsigned int i, j, k;
+    int pivot;
+    j = 0, i = 0;
+
+    while (j < result->num_cols && i < result->num_cols) {
+        // Find the pivot - the first non-zero entry in the column 'j' below row 'i'
+        pivot = matrix_pivotidx(result, j, i);
+
+        if (pivot < 0) {
+            // All elements in the column are zeros
+            // Move to the next column without doing anything
+            j++;
+            continue;
+        }
+
+        // Interchange rows, moving the pivot to the first row that doesn't have a pivot
+        if (pivot != (int)i) {
+            matrix_swap_rows(result, i, pivot);
+        }
+
+        // Multiply each element in the pivot row by the inverse of the pivot
+        double pivot_value = matrix_at(result, i, j);
+        matrix_row_mult_r(result, i, 1.0 / pivot_value);
+
+        // Add multiples of the pivot row to make every element in the column below the pivot equal to 0
+        for (k = i + 1; k < result->num_rows; k++) {
+            double factor = -matrix_at(result, k, j);
+            matrix_row_addrow(result, i, k, factor);
+        }
+
+        i++;
+        j++;
+    }
+
+    return result;
+}
 

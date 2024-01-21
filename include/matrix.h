@@ -70,12 +70,16 @@ void matrix_col_mult_r(matrix *mat, unsigned int col, double value);
 //multiply a matrix with a scalar (all rows and columns)
 void matrix_mult_r(matrix *mat, double value);
 
-void matrix_row_addrow(matrix *mat, unsigned int row1_index, unsigned int row2_index, unsigned int result_row_index);
+void matrix_row_addrow(matrix *mat, unsigned int row1_index, unsigned int row2_index, double factor);
 
 
 matrix *matrix_add(const matrix *mat1, const matrix *mat2);
 matrix *matrix_subtract(const matrix *mat1, const matrix *mat2);
 matrix *matrix_mult(const matrix *mat1, const matrix *mat2);
 
+int matrix_pivotidx(matrix *mat, unsigned int col, unsigned int row);
+matrix *matrix_ref(matrix *mat);
+
 
 #endif //MATRIX_H
+

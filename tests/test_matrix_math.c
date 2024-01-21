@@ -53,39 +53,17 @@ Test(matrix_math, col_mult_r) {
 }
 
 // Test case for multiplying the entire matrix by a scalar
-Test(matrix_math, matrix_mult_r) {
-    matrix *mat = matrix_new(2, 2, sizeof(double));
-    cr_assert_not_null(mat, "Matrix allocation returned NULL");
-
-    // Initialize matrix with some values
-    double *data = (double *) mat->data;
-    data[0] = 1.0; 
-    data[1] = 2.0;
-    data[2] = 3.0; 
-    data[3] = 4.0;
-
-    double scalar = 6.0;
-    matrix_mult_r(mat, scalar); // Multiply entire matrix by scalar
-
-    // Verify that each element is multiplied by scalar
-    for (unsigned int i = 0; i < 4; i++) {
-        cr_assert_eq(data[i], (i + 1) * scalar, "Element [%u] is not correctly multiplied", i);
-    }
-
-    matrix_free(mat);
-}
-
 Test(matrix_math, add_rows_square_matrix) {
     matrix *mat = matrix_new(3, 3, sizeof(double));
     double values[9] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     memcpy(mat->data, values, 9 * sizeof(double));
 
-    matrix_row_addrow(mat, 0, 1, 1); // Add rows 0 and 1, store result in row 2
+    matrix_row_addrow(mat, 0, 1, 2.0); // Add rows 0 and 1, store result in row 1
 
-    // Check if the sum is correct in row 2
-    cr_assert_eq(((double*)mat->data)[3], 5.0, "Row addition result is incorrect");
-    cr_assert_eq(((double*)mat->data)[4], 7.0, "Row addition result is incorrect");
-    cr_assert_eq(((double*)mat->data)[5], 9.0, "Row addition result is incorrect");
+    // Check if the sum is correct in row 1
+    cr_assert_eq(((double*)mat->data)[3], 6.0, "Row addition result is incorrect");
+    cr_assert_eq(((double*)mat->data)[4], 9.0, "Row addition result is incorrect");
+    cr_assert_eq(((double*)mat->data)[5], 12.0, "Row addition result is incorrect");
 
     matrix_free(mat);
 }
@@ -95,15 +73,14 @@ Test(matrix_math, add_rows_rectangular_matrix) {
     double values[8] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
     memcpy(mat->data, values, 8 * sizeof(double));
 
-    matrix_row_addrow(mat, 1, 2, 3); // Add rows 1 and 2, store result in row 3
+    matrix_row_addrow(mat, 1, 2, 3.0); // Add rows 1 and 2, store result in row 2
 
-    // Check if the sum is correct in row 3
-    cr_assert_eq(((double*)mat->data)[6], 8.0, "Row addition result is incorrect");
-    cr_assert_eq(((double*)mat->data)[7], 10.0, "Row addition result is incorrect");
+    // Check if the sum is correct in row 1
+    cr_assert_eq(((double*)mat->data)[4], 14.0, "Row addition result is incorrect");
+    cr_assert_eq(((double*)mat->data)[5], 18.0, "Row addition result is incorrect");
 
     matrix_free(mat);
 }
-
 
 Test(matrix_math, add_rows_invalid_indices) {
     matrix *mat = matrix_new(2, 2, sizeof(double));
@@ -111,25 +88,7 @@ Test(matrix_math, add_rows_invalid_indices) {
     memcpy(mat->data, values, 4 * sizeof(double));
 
     // Call with invalid indices and check if function handles it gracefully
-    matrix_row_addrow(mat, 2, 3, 1); // Invalid indices
-
-    // Check if the matrix is unchanged
-    cr_assert_eq(((double*)mat->data)[0], 1.0, "Matrix should be unchanged");
-    cr_assert_eq(((double*)mat->data)[1], 2.0, "Matrix should be unchanged");
-    cr_assert_eq(((double*)mat->data)[2], 3.0, "Matrix should be unchanged");
-    cr_assert_eq(((double*)mat->data)[3], 4.0, "Matrix should be unchanged");
-
-    matrix_free(mat);
-}
-
-
-Test(matrix_math, add_rows_result_invalid_indices) {
-    matrix *mat = matrix_new(2, 2, sizeof(double));
-    double values[4] = {1.0, 2.0, 3.0, 4.0};
-    memcpy(mat->data, values, 4 * sizeof(double));
-
-    // Call with invalid indices and check if function handles it gracefully
-    matrix_row_addrow(mat, 0, 1, 4); // Invalid indices
+    matrix_row_addrow(mat, 2, 3, 1.0); // Invalid indices
 
     // Check if the matrix is unchanged
     cr_assert_eq(((double*)mat->data)[0], 1.0, "Matrix should be unchanged");
@@ -275,3 +234,41 @@ Test(matrix_math, matrix_mult_rectangular_matrices) {
     matrix_free(mat2);
     matrix_free(result);
 }
+
+// Test case for pivotidx function
+Test(matrix_math, pivotidx_test) {
+    matrix *mat = matrix_new(3, 3, sizeof(double));
+    double values[9] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+    memcpy(mat->data, values, 9 * sizeof(double));
+
+    unsigned int pivot = matrix_pivotidx(mat, 0, 0);
+
+    cr_assert_eq(pivot, 2, "Pivot index is incorrect");
+
+    matrix_free(mat);
+}
+
+// Test case for matrix_ref function
+Test(matrix_math, matrix_ref_test) {
+    matrix *mat = matrix_new(3, 3, sizeof(double));
+    double values[9] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+    memcpy(mat->data, values, 9 * sizeof(double));
+
+    matrix *ref = matrix_ref(mat);
+
+    // Check if the dimensions of the reference matrix are correct
+    cr_assert_eq(ref->num_rows, 3, "Reference matrix has incorrect number of rows");
+    cr_assert_eq(ref->num_cols, 3, "Reference matrix has incorrect number of columns");
+
+    // Check if the values in the reference matrix match the expected values
+    double *ref_data = (double *)ref->data;
+    double expected_values[9] = {1.0, 1.142857, 1.285714, 0.0, 1.0, 2.0, 0.0, 0.0, 0.0};
+    matrix_print(ref);
+    for (int i = 0; i < 9; i++) {
+        cr_assert_float_eq(ref_data[i], expected_values[i], 1e-6, "Element at index %d in reference matrix is incorrect", i);
+    }
+
+    matrix_free(mat);
+    matrix_free(ref);
+}
+

@@ -17,6 +17,45 @@ Test(matrix_init, new_3by4) {
     matrix_free(mat);  // Assuming this is your deallocation function
 }
 
+Test(matrix_operations, set_2x2_matrix_element) {
+    // Create a 2x2 matrix for testing
+    unsigned int num_rows = 2;
+    unsigned int num_cols = 2;
+    size_t element_size = sizeof(double);
+    matrix *mat = matrix_new(num_rows, num_cols, element_size);
+
+    // Set an element at a specific position (e.g., row 1, column 0) to a value
+    double value = 42.425;
+    unsigned int row_index = 1;
+    unsigned int col_index = 0;
+    matrix_set(mat, row_index, col_index, value);
+
+    // Check if the element at the specified position is equal to the set value
+    cr_assert_eq(matrix_at(mat, row_index, col_index), value);
+
+    matrix_free(mat); // Free the allocated matrix
+}
+
+Test(matrix_operations, set_3x3_matrix_element) {
+    // Create a 3x3 matrix for testing
+    unsigned int num_rows = 3;
+    unsigned int num_cols = 3;
+    size_t element_size = sizeof(double);
+    matrix *mat = matrix_new(num_rows, num_cols, element_size);
+
+    // Set an element at a specific position (e.g., row 2, column 1) to a value
+    double value = 88.88;
+    unsigned int row_index = 2;
+    unsigned int col_index = 1;
+    matrix_set(mat, row_index, col_index, value);
+
+    // Check if the element at the specified position is equal to the set value
+    cr_assert_eq(matrix_at(mat, row_index, col_index), value);
+
+    matrix_free(mat); // Free the allocated matrix
+}
+
+
 // Test case 1: Set all elements of a matrix to 0
 Test(matrix_init, all_set_to_zero) {
     // Create a matrix for testing

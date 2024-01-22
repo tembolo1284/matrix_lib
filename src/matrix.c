@@ -210,6 +210,20 @@ matrix *matrix_submatrix(const matrix *mat, Range row_range, Range col_range) {
     return submat;
 }
 
+void matrix_set(matrix *mat, unsigned int i, unsigned int j, double value) {
+    if (mat == NULL || i >= mat->num_rows || j >= mat->num_cols) {
+        // Check for invalid input or matrix dimensions
+        return;  // Return without making any changes
+    }
+
+    // Calculate the index in the matrix data array for the specified element
+    unsigned int index = i * mat->num_cols + j;
+
+    // Update the value at the specified index
+    ((double *)mat->data)[index] = value;
+}
+
+
 void matrix_all_set(matrix *mat, const void *value, size_t value_size) {
     for (unsigned int i = 0; i < mat->num_rows; ++i) {
         for (unsigned int j = 0; j < mat->num_cols; ++j) {
@@ -636,5 +650,86 @@ matrix *matrix_ref(matrix *mat) {
     }
 
     return result;
+}
+
+void matrix_lup_free(matrix_lup *lu) {
+    matrix_free(lu->P);
+    matrix_free(lu->L);
+    matrix_free(lu->U);
+    free(lu);
+}
+
+
+// Function to create a new LUP decomposition
+matrix_lup *matrix_lup_new(matrix *L, matrix *U, matrix *P, unsigned int num_permutations) {
+    matrix_lup *lup = malloc(sizeof(matrix_lup));
+    if (!lup) {
+        fprintf(stderr, "Failed to allocate memory for LUP decomposition.\n");
+        return NULL;
+    }
+
+    lup->L = L;
+    lup->U = U;
+    lup->P = P;
+    lup->num_permutations = num_permutations;
+
+    return lup;
+}
+
+// Function to perform LUP decomposition on a matrix
+matrix_lup *matrix_lup_solve(matrix *m) {
+    if (!m->is_square) {
+        fprintf(stderr, "Matrix must be square for LUP decomposition.\n");
+        return NULL;
+    }
+
+    // Create matrices for L, U, and P
+    double identity_element = 1.0;
+    matrix *L = matrix_eye(m->num_rows, sizeof(double), &identity_element);
+    matrix *U = matrix_copy(m);
+    matrix *P = matrix_eye(m->num_rows, sizeof(double), &identity_element);
+
+    unsigned int num_permutations = 0;
+    double mult;
+
+    for (unsigned int j = 0; j < U->num_cols; j++) {
+        // Find the pivot (maximum absolute value) in the current column
+        unsigned int pivot = j;
+        for (unsigned int i = j + 1; i < U->num_rows; i++) {
+            if (fabs(matrix_at(U, i, j)) > fabs(matrix_at(U, pivot, j))) {
+                pivot = i;
+            }
+        }
+
+        if (fabs(matrix_at(U, pivot, j)) < 1e-10) {
+            fprintf(stderr, "Matrix is degenerate, LUP decomposition failed.\n");
+            matrix_free(L);
+            matrix_free(U);
+            matrix_free(P);
+            return NULL;
+        }
+
+        if (pivot != j) {
+            // Swap rows in U, L, and P to move the pivot to the current row
+            matrix_swap_rows(U, j, pivot);
+            matrix_swap_rows(L, j, pivot);
+            matrix_swap_rows(P, j, pivot);
+            num_permutations++;
+        }
+
+        for (unsigned int i = j + 1; i < U->num_rows; i++) {
+            mult = matrix_at(U, i, j) / matrix_at(U, j, j);
+            // Update U and store the multiplier in L
+            matrix_row_addrow(U, j, i, -mult);
+            matrix_set(L, i, j, mult);
+        }
+    }
+
+    double val = 1.0;
+    matrix_diag_set(L, &val, sizeof(double));
+
+    // Create the LUP decomposition
+    matrix_lup *lup = matrix_lup_new(L, U, P, num_permutations);
+    return lup;
 }
 

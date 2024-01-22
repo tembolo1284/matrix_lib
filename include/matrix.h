@@ -15,6 +15,14 @@ typedef struct Range_s {
   int end;
 } Range;
 
+typedef struct {
+  matrix *L;
+  matrix *U;
+  matrix *P;
+  unsigned int num_permutations;
+
+} matrix_lup;
+
 /******* Matrix Initialization Operations *******/
 matrix *matrix_new(unsigned int num_rows, unsigned int num_cols, size_t element_size);
 
@@ -42,6 +50,7 @@ matrix *matrix_slice(matrix *mat, Range row_range, Range col_range);
 matrix *matrix_submatrix(const matrix *mat, Range row_range, Range col_range);
 matrix *matrix_copy(const matrix *src);
 
+void matrix_set(matrix *mat, unsigned int i, unsigned int j, double value);
 void matrix_all_set(matrix *mat, const void *value, size_t value_size);
 void matrix_diag_set(matrix *mat, const void *value, size_t value_size);
 
@@ -79,6 +88,10 @@ matrix *matrix_mult(const matrix *mat1, const matrix *mat2);
 
 int matrix_pivotidx(matrix *mat, unsigned int col, unsigned int row);
 matrix *matrix_ref(matrix *mat);
+
+matrix_lup *matrix_lup_new(matrix *L, matrix *U, matrix *P, unsigned int num_permutations);
+matrix_lup *matrix_lup_solve(matrix *m);
+void matrix_lup_free(matrix_lup *lu);
 
 
 #endif //MATRIX_H

@@ -206,6 +206,32 @@ int main() {
     matrix_free(mat_remove_col);
     matrix_free(mat_all);
     matrix_free(mat_diag);
+
+    printf("LU decomposition time!\n");
+    matrix *mat9 = matrix_new(2, 2, sizeof(double));
+
+    ((double *)mat9->data)[0] = 2.0;
+    ((double *)mat9->data)[1] = 1.0;
+    ((double *)mat9->data)[2] = 1.0;
+    ((double *)mat9->data)[3] = 3.0;
+
+    printf("mat9 is below.\n");
+    matrix_print(mat9);
+
+    matrix_lup *lup = matrix_lup_solve(mat9);
+    printf("Matrix L is:\n");
+    matrix_print(lup->L);
+
+    printf("Matrix U is:\n");
+    matrix_print(lup->U);
+
+    printf("Matrix P is:\n");
+    matrix_print(lup->P);
+
+    matrix_lup_free(lup);
+    matrix_free(mat9);
     return 0;
 }
+
+
 

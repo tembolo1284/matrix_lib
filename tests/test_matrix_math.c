@@ -272,3 +272,106 @@ Test(matrix_math, matrix_ref_test) {
     matrix_free(ref);
 }
 
+// Test case for matrix_lup_new() function
+Test(matrix_math, lup_new_test) {
+    // Create a matrix
+    matrix *mat = matrix_new(3, 3, sizeof(double));
+    double values[9] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+    memcpy(mat->data, values, 9 * sizeof(double));
+
+    double val = 1.0;
+
+    // Create L and U matrices (for simplicity, set L to the identity matrix and U to the original matrix)
+    matrix *L = matrix_eye(3, sizeof(double), &val); // Identity matrix
+    matrix *U = matrix_new(3, 3, sizeof(double));
+    memcpy(U->data, values, 9 * sizeof(double)); // Same as the original matrix
+
+    // Create a permutation matrix P (for simplicity, set P to the identity matrix)
+    matrix *P = matrix_eye(3, sizeof(double), &val); // Identity matrix
+
+    // Create an LUP decomposition
+    matrix_lup *lup = matrix_lup_new(L, U, P, 0); // 0 permutations
+
+    // Check if the LUP decomposition was successfully created
+    cr_assert_not_null(lup, "LUP decomposition creation failed");
+
+    // Check if the L, U, and P matrices are not NULL
+    cr_assert_not_null(lup->L, "L matrix in LUP decomposition is NULL");
+    cr_assert_not_null(lup->U, "U matrix in LUP decomposition is NULL");
+    cr_assert_not_null(lup->P, "P matrix in LUP decomposition is NULL");
+
+    // Check if the dimensions of L, U, and P matrices are correct
+    cr_assert_eq(lup->L->num_rows, 3, "L matrix in LUP decomposition has incorrect number of rows");
+    cr_assert_eq(lup->L->num_cols, 3, "L matrix in LUP decomposition has incorrect number of columns");
+    cr_assert_eq(lup->U->num_rows, 3, "U matrix in LUP decomposition has incorrect number of rows");
+    cr_assert_eq(lup->U->num_cols, 3, "U matrix in LUP decomposition has incorrect number of columns");
+    cr_assert_eq(lup->P->num_rows, 3, "P matrix in LUP decomposition has incorrect number of rows");
+    cr_assert_eq(lup->P->num_cols, 3, "P matrix in LUP decomposition has incorrect number of columns");
+
+    // Check if the values in L, U, and P matrices are correct
+    double *L_data = (double *)lup->L->data;
+    double *U_data = (double *)lup->U->data;
+    double *P_data = (double *)lup->P->data;
+
+    // Expected values for L, U, and P matrices
+    double expected_L[9] = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0}; // identity matrix
+    double expected_U[9] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0}; // same as U matrix
+    double expected_P[9] = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0}; // identity matrix
+
+    for (int i = 0; i < 9; i++) {
+        cr_assert_float_eq(L_data[i], expected_L[i], 1e-6, "Element at index %d in L matrix is incorrect", i);
+        cr_assert_float_eq(U_data[i], expected_U[i], 1e-6, "Element at index %d in U matrix is incorrect", i);
+        cr_assert_float_eq(P_data[i], expected_P[i], 1e-6, "Element at index %d in P matrix is incorrect", i);
+    }
+
+    // Free the LUP decomposition and the original matrix
+    matrix_lup_free(lup);
+    matrix_free(mat);
+}
+
+// Test case for matrix_lup_solve() function
+Test(matrix_math, lup_factorization_2x2_test) {
+    // Create a 2x2 matrix
+    matrix *mat = matrix_new(2, 2, sizeof(double));
+    double values[4] = {2.0, 1.0, 1.0, 3.0};
+    memcpy(mat->data, values, 4 * sizeof(double));
+
+    // Create an LUP decomposition
+    matrix_lup *lup = matrix_lup_solve(mat);
+
+    // Check if the LUP decomposition was successfully created
+    cr_assert_not_null(lup, "LUP decomposition creation failed");
+
+    // Check if the L, U, and P matrices are not NULL
+    cr_assert_not_null(lup->L, "L matrix in LUP decomposition is NULL");
+    cr_assert_not_null(lup->U, "U matrix in LUP decomposition is NULL");
+    cr_assert_not_null(lup->P, "P matrix in LUP decomposition is NULL");
+
+    // Check if the dimensions of L, U, and P matrices are correct
+    cr_assert_eq(lup->L->num_rows, 2, "L matrix in LUP decomposition has incorrect number of rows");
+    cr_assert_eq(lup->L->num_cols, 2, "L matrix in LUP decomposition has incorrect number of columns");
+    cr_assert_eq(lup->U->num_rows, 2, "U matrix in LUP decomposition has incorrect number of rows");
+    cr_assert_eq(lup->U->num_cols, 2, "U matrix in LUP decomposition has incorrect number of columns");
+    cr_assert_eq(lup->P->num_rows, 2, "P matrix in LUP decomposition has incorrect number of rows");
+    cr_assert_eq(lup->P->num_cols, 2, "P matrix in LUP decomposition has incorrect number of columns");
+
+    // Check if the values in L, U, and P matrices are correct
+    double *L_data = (double *)lup->L->data;
+    double *U_data = (double *)lup->U->data;
+    double *P_data = (double *)lup->P->data;
+
+    // Expected values for L, U, and P matrices
+    double expected_L[4] = {1.0, 0.0, 0.5, 1.0};
+    double expected_U[4] = {2.0, 1.0, 0.0, 2.5};
+    double expected_P[4] = {1.0, 0.0, 0.0, 1.0};
+
+    for (int i = 0; i < 4; i++) {
+        cr_assert_float_eq(L_data[i], expected_L[i], 1e-6, "Element at index %d in L matrix is incorrect", i);
+        cr_assert_float_eq(U_data[i], expected_U[i], 1e-6, "Element at index %d in U matrix is incorrect", i);
+        cr_assert_float_eq(P_data[i], expected_P[i], 1e-6, "Element at index %d in P matrix is incorrect", i);
+    }
+
+    // Free the LUP decomposition and the original matrix
+    matrix_lup_free(lup);
+    matrix_free(mat);
+}

@@ -95,6 +95,7 @@ void matrix_lup_free(matrix_lup *lu);
 
 matrix *matrix_ls_solvefwd(matrix *L, matrix *b);
 matrix *matrix_ls_solvebck(matrix *U, matrix *b);
+matrix *matrix_ls_solve(matrix_lup *lu, matrix *b);
 
 #endif //MATRIX_H
 

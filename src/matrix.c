@@ -790,3 +790,27 @@ matrix *matrix_ls_solvebck(matrix *U, matrix *b) {
     return x;
 }
 
+matrix *matrix_ls_solve(matrix_lup *lu, matrix *b) {
+  // Check if dimensions are valid
+  if (lu->U->num_rows != b->num_rows || b->num_cols != 1) {
+    fprintf(stderr, "Dimensions of matrix are not valid.\n");
+    return NULL;
+  }
+
+  // Calculate Pb = P*b
+  matrix *Pb = matrix_mult(lu->P, b);
+
+  // Solve L*y = Pb using forward substitution
+  matrix *y = matrix_ls_solvefwd(lu->L, Pb);
+
+  // Solve U*x = y using backward substitution
+  matrix *x = matrix_ls_solvebck(lu->U, y);
+
+  // Free intermediate matrices
+  matrix_free(y);
+  matrix_free(Pb);
+
+  return x;
+}
+
+

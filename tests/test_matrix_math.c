@@ -13,15 +13,11 @@ Test(matrix_math, row_mult_r) {
     for (unsigned int i = 0; i < 9; i++) {
         data[i] = i + 1; // 1 to 9
     }
-    printf("Matrix `mat` before scalar mult of second row\n");
-    matrix_print(mat);
 
     double scalar = 2.0;
     matrix_row_mult_r(mat, 1, scalar); // Multiply second row by scalar
 
     // Verify that the second row is multiplied by scalar
-    printf("Matrix `mat` after scalar mult of second row by 2.\n");
-    matrix_print(mat);
 
     for (unsigned int i = 0; i < 3; i++) {
         cr_assert_eq(data[3 + i], (i + 4) * scalar, "Element at [1][%u] is not correctly multiplied", i);
@@ -263,7 +259,6 @@ Test(matrix_math, matrix_ref_test) {
     // Check if the values in the reference matrix match the expected values
     double *ref_data = (double *)ref->data;
     double expected_values[9] = {1.0, 1.142857, 1.285714, 0.0, 1.0, 2.0, 0.0, 0.0, 0.0};
-    matrix_print(ref);
     for (int i = 0; i < 9; i++) {
         cr_assert_float_eq(ref_data[i], expected_values[i], 1e-6, "Element at index %d in reference matrix is incorrect", i);
     }
@@ -506,7 +501,6 @@ Test(matrix_math, ls_solvebck_3x3) {
     // Check if the solution vector values are correct
     double *x_values = (double *)x->data;
     double expected_values[3] = {2.4, 2.4, 3.0};
-    matrix_print(x);
 
     for (int i = 0; i < 3; i++) {
         cr_assert_float_eq(x_values[i], expected_values[i], 1e-6, "Element at index %d in solution vector is incorrect", i);
@@ -518,4 +512,75 @@ Test(matrix_math, ls_solvebck_3x3) {
     matrix_free(x);
 }
 
+Test(matrix_math, ls_solve_2x2) {
+    // Create a 2x2 coefficient matrix A
+    matrix *A = matrix_new(2, 2, sizeof(double));
+    double A_values[4] = {2.0, 1.0, 1.0, 3.0};
+    memcpy(A->data, A_values, 4 * sizeof(double));
+
+    // Create a 2x1 column vector b
+    matrix *b = matrix_new(2, 1, sizeof(double));
+    double b_values[2] = {5.0, 7.0};
+    memcpy(b->data, b_values, 2 * sizeof(double));
+
+    matrix_lup *lu = matrix_lup_solve(A);
+    // Solve the linear system Ax = b using matrix_ls_solve
+    matrix *x = matrix_ls_solve(lu, b);
+
+    // Check if the solution vector is not NULL
+    cr_assert_not_null(x, "Solution vector is NULL");
+
+    // Check if the dimensions of the solution vector are correct
+    cr_assert_eq(x->num_rows, 2, "Solution vector has incorrect number of rows");
+    cr_assert_eq(x->num_cols, 1, "Solution vector has incorrect number of columns");
+
+    // Check if the solution vector values are correct
+    double *x_values = (double *)x->data;
+    double expected_values[2] = {1.6, 1.8}; // Expected solution for this system
+
+    for (int i = 0; i < 2; i++) {
+        cr_assert_float_eq(x_values[i], expected_values[i], 1e-6, "Element at index %d in solution vector is incorrect", i);
+    }
+
+    // Free the matrices and solution vector
+    matrix_free(A);
+    matrix_free(b);
+    matrix_free(x);
+}
+
+Test(matrix_math, ls_solve_3x3) {
+    // Create a 3x3 coefficient matrix A
+    matrix *A = matrix_new(3, 3, sizeof(double));
+    double A_values[9] = {2.0, 1.0, 3.0, 1.0, 3.0, 2.0, 3.0, 2.0, 1.0};
+    memcpy(A->data, A_values, 9 * sizeof(double));
+
+    // Create a 3x1 column vector b
+    matrix *b = matrix_new(3, 1, sizeof(double));
+    double b_values[3] = {8.0, 7.0, 6.0};
+    memcpy(b->data, b_values, 3 * sizeof(double));
+
+    matrix_lup *lu = matrix_lup_solve(A);
+    // Solve the linear system Ax = b using matrix_ls_solve
+    matrix *x = matrix_ls_solve(lu, b);
+
+    // Check if the solution vector is not NULL
+    cr_assert_not_null(x, "Solution vector is NULL");
+
+    // Check if the dimensions of the solution vector are correct
+    cr_assert_eq(x->num_rows, 3, "Solution vector has incorrect number of rows");
+    cr_assert_eq(x->num_cols, 1, "Solution vector has incorrect number of columns");
+
+    // Check if the solution vector values are correct
+    double *x_values = (double *)x->data;
+    double expected_values[3] = {0.833333, 0.833333, 1.833333}; // Expected solution for this system
+
+    for (int i = 0; i < 3; i++) {
+        cr_assert_float_eq(x_values[i], expected_values[i], 1e-6, "Element at index %d in solution vector is incorrect", i);
+    }
+
+    // Free the matrices and solution vector
+    matrix_free(A);
+    matrix_free(b);
+    matrix_free(x);
+}
 

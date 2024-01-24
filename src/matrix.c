@@ -733,3 +733,60 @@ matrix_lup *matrix_lup_solve(matrix *m) {
     return lup;
 }
 
+// Function to perform forward substitution to solve the linear system L * x = b
+matrix *matrix_ls_solvefwd(matrix *L, matrix *b) {
+    if (L == NULL || b == NULL) {
+        fprintf(stderr, "Invalid input matrices for forward substitution.\n");
+        return NULL;
+    }
+
+    if (L->num_rows != L->num_cols) {
+        fprintf(stderr, "Matrix L must be square for forward substitution.\n");
+        return NULL;
+    }
+
+    if (L->num_rows != b->num_rows || b->num_cols != 1) {
+        fprintf(stderr, "Matrix dimensions are not compatible for forward substitution.\n");
+        return NULL;
+    }
+
+    unsigned int n = L->num_rows;
+    matrix *x = matrix_new(n, 1, sizeof(double));
+
+    if (x == NULL) {
+        fprintf(stderr, "Memory allocation failed for the solution vector.\n");
+        return NULL;
+    }
+
+    // Perform forward substitution
+    for (unsigned int i = 0; i < n; i++) {
+        double sum = 0.0;
+        for (unsigned int j = 0; j < i; j++) {
+            sum += matrix_at(L, i, j) * matrix_at(x, j, 0);
+        }
+        double bi = matrix_at(b, i, 0);
+        double xi = (bi - sum) / matrix_at(L, i, i);
+        matrix_set(x, i, 0, xi);
+    }
+
+    return x;
+}
+
+matrix *matrix_ls_solvebck(matrix *U, matrix *b) {
+    matrix *x = matrix_new(U->num_cols, 1, sizeof(double));
+    int i = U->num_cols - 1;
+    int j;
+    double tmp;
+    
+    while (i >= 0) {
+        tmp = ((double *)b->data)[i * b->num_cols + 0];
+        for (j = i + 1; j < (int)(U->num_cols); j++) {
+    	    tmp -= matrix_at(U, i, j) * matrix_at(x, j, 0);
+        }
+	matrix_set(x, i, 0, tmp / matrix_at(U, i, i));
+        i--;
+    }
+    
+    return x;
+}
+

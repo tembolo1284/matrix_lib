@@ -374,4 +374,148 @@ Test(matrix_math, lup_factorization_2x2_test) {
     // Free the LUP decomposition and the original matrix
     matrix_lup_free(lup);
     matrix_free(mat);
+
 }
+
+Test(matrix_math, ls_solvefwd_2x2) {
+    // Create a 2x2 lower triangular matrix L
+    matrix *L = matrix_new(2, 2, sizeof(double));
+    double L_values[4] = {1.0, 0.0, 2.0, 3.0};
+    memcpy(L->data, L_values, 4 * sizeof(double));
+
+    // Create a 2x1 column matrix b
+    matrix *b = matrix_new(2, 1, sizeof(double));
+    double b_values[2] = {4.0, 7.0};
+    memcpy(b->data, b_values, 2 * sizeof(double));
+
+    // Perform forward substitution
+    matrix *x = matrix_ls_solvefwd(L, b);
+
+    // Check if the solution vector is not NULL
+    cr_assert_not_null(x, "Solution vector is NULL");
+
+    // Check if the dimensions of the solution vector are correct
+    cr_assert_eq(x->num_rows, 2, "Solution vector has incorrect number of rows");
+    cr_assert_eq(x->num_cols, 1, "Solution vector has incorrect number of columns");
+
+    // Check if the solution vector values are correct
+    double *x_values = (double *)x->data;
+    double expected_values[2] = {4.0, (-1.0/3.0)}; // Expected solution for this system
+
+    for (int i = 0; i < 2; i++) {
+        cr_assert_float_eq(x_values[i], expected_values[i], 1e-6, "Element at index %d in solution vector is incorrect", i);
+    }
+
+    // Free the matrices and the solution vector
+    matrix_free(L);
+    matrix_free(b);
+    matrix_free(x);
+}
+
+Test(matrix_math, ls_solvefwd_3x3) {
+    // Create a 3x3 lower triangular matrix L
+    matrix *L = matrix_new(3, 3, sizeof(double));
+    double L_values[9] = {1.0, 0.0, 0.0, 2.0, 3.0, 0.0, 4.0, 5.0, 6.0};
+    memcpy(L->data, L_values, 9 * sizeof(double));
+
+    // Create a 3x1 column matrix b
+    matrix *b = matrix_new(3, 1, sizeof(double));
+    double b_values[3] = {1.0, 8.0, 24.0};
+    memcpy(b->data, b_values, 3 * sizeof(double));
+
+    // Perform forward substitution
+    matrix *x = matrix_ls_solvefwd(L, b);
+
+    // Check if the solution vector is not NULL
+    cr_assert_not_null(x, "Solution vector is NULL");
+
+    // Check if the dimensions of the solution vector are correct
+    cr_assert_eq(x->num_rows, 3, "Solution vector has incorrect number of rows");
+    cr_assert_eq(x->num_cols, 1, "Solution vector has incorrect number of columns");
+
+    // Check if the solution vector values are correct
+    double *x_values = (double *)x->data;
+    double expected_values[3] = {1.0, 2.0, (5.0/3.0)}; // Expected solution for this system
+
+    for (int i = 0; i < 3; i++) {
+        cr_assert_float_eq(x_values[i], expected_values[i], 1e-6, "Element at index %d in solution vector is incorrect", i);
+    }
+
+    // Free the matrices and the solution vector
+    matrix_free(L);
+    matrix_free(b);
+    matrix_free(x);
+}
+
+Test(matrix_math, ls_solvebck_2x2) {
+    // Create an upper triangular matrix U (2x2)
+    matrix *U = matrix_new(2, 2, sizeof(double));
+    double U_values[4] = {2.0, 3.0, 0.0, 5.0};
+    memcpy(U->data, U_values, 4 * sizeof(double));
+
+    // Create a column vector b (2x1)
+    matrix *b = matrix_new(2, 1, sizeof(double));
+    double b_values[2] = {10.0, 15.0};
+    memcpy(b->data, b_values, 2 * sizeof(double));
+
+    // Solve the linear system U * x = b using back substitution
+    matrix *x = matrix_ls_solvebck(U, b);
+
+    // Check if the solution vector is not NULL
+    cr_assert_not_null(x, "Solution vector is NULL");
+
+    // Check if the dimensions of the solution vector are correct
+    cr_assert_eq(x->num_rows, 2, "Solution vector has incorrect number of rows");
+    cr_assert_eq(x->num_cols, 1, "Solution vector has incorrect number of columns");
+
+    // Check if the solution vector values are correct
+    double *x_values = (double *)x->data;
+    double expected_values[2] = {(1.0/2.0), 3.0};
+
+    for (int i = 0; i < 2; i++) {
+        cr_assert_float_eq(x_values[i], expected_values[i], 1e-6, "Element at index %d in solution vector is incorrect", i);
+    }
+
+    // Free the matrices and solution vector
+    matrix_free(U);
+    matrix_free(b);
+    matrix_free(x);
+}
+
+Test(matrix_math, ls_solvebck_3x3) {
+    // Create an upper triangular matrix U (3x3)
+    matrix *U = matrix_new(3, 3, sizeof(double));
+    double U_values[9] = {2.0, 3.0, 1.0, 0.0, 5.0, 4.0, 0.0, 0.0, 3.0};
+    memcpy(U->data, U_values, 9 * sizeof(double));
+
+    // Create a column vector b (3x1)
+    matrix *b = matrix_new(3, 1, sizeof(double));
+    double b_values[3] = {15.0, 24.0, 9.0};
+    memcpy(b->data, b_values, 3 * sizeof(double));
+
+    // Solve the linear system U * x = b using back substitution
+    matrix *x = matrix_ls_solvebck(U, b);
+
+    // Check if the solution vector is not NULL
+    cr_assert_not_null(x, "Solution vector is NULL");
+
+    // Check if the dimensions of the solution vector are correct
+    cr_assert_eq(x->num_rows, 3, "Solution vector has incorrect number of rows");
+    cr_assert_eq(x->num_cols, 1, "Solution vector has incorrect number of columns");
+
+    // Check if the solution vector values are correct
+    double *x_values = (double *)x->data;
+    double expected_values[3] = {2.4, 2.4, 3.0};
+    matrix_print(x);
+
+    for (int i = 0; i < 3; i++) {
+        cr_assert_float_eq(x_values[i], expected_values[i], 1e-6, "Element at index %d in solution vector is incorrect", i);
+    }
+
+    // Free the matrices and solution vector
+    matrix_free(U);
+    matrix_free(b);
+    matrix_free(x);
+}
+
+

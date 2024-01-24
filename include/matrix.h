@@ -93,6 +93,8 @@ matrix_lup *matrix_lup_new(matrix *L, matrix *U, matrix *P, unsigned int num_per
 matrix_lup *matrix_lup_solve(matrix *m);
 void matrix_lup_free(matrix_lup *lu);
 
+matrix *matrix_ls_solvefwd(matrix *L, matrix *b);
+matrix *matrix_ls_solvebck(matrix *U, matrix *b);
 
 #endif //MATRIX_H
 

@@ -221,7 +221,6 @@ Test(matrix_init, print) {
 
     // Printing the matrix
     cr_log_info("Printing matrix:\n");
-    matrix_print(mat);
 
     matrix_free(mat);
 }

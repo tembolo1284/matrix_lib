@@ -869,5 +869,22 @@ matrix *matrix_inv(matrix *mat) {
     matrix_free(identity);
 
     return inverse;
+
 }
+
+double matrix_det(matrix_lup *lup) {
+    int k;
+    int sign = (lup->num_permutations % 2 == 0) ? 1 : -1;
+    matrix *U = lup->U;
+    double product = 1.0;
+
+    for(k = 0; k < (int)(U->num_rows); k++) {
+        product *= matrix_at(U, k, k);
+    }
+
+    return product * sign;
+
+}
+
+
 

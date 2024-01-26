@@ -584,3 +584,53 @@ Test(matrix_math, ls_solve_3x3) {
     matrix_free(x);
 }
 
+
+Test(matrix_operations, determinant_2x2_matrix) {
+    matrix *mat = matrix_new(2, 2, sizeof(double));
+
+    // Initialize the 2x2 matrix with specific values
+    double *data = (double *)mat->data;
+    data[0] = 2.0;
+    data[1] = 3.0;
+    data[2] = 1.0;
+    data[3] = 4.0;
+
+    // Calculate the determinant using the matrix_det function
+    matrix_lup *lu = matrix_lup_solve(mat);
+    double determinant = matrix_det(lu);
+
+    // The determinant of the 2x2 matrix [2 3; 1 4] is 2*4 - 3*1 = 8 - 3 = 5
+    cr_assert_float_eq(determinant, 5.0, 1e-6, "Determinant of 2x2 matrix is incorrect");
+
+    // Free resources
+    matrix_lup_free(lu);
+    matrix_free(mat);
+}
+
+Test(matrix_operations, determinant_3x3_matrix) {
+    matrix *mat = matrix_new(3, 3, sizeof(double));
+
+    // Initialize the 3x3 matrix with specific values
+    double *data = (double *)mat->data;
+    data[0] = 2.0;
+    data[1] = 0.0;
+    data[2] = 1.0;
+    data[3] = 3.0;
+    data[4] = 2.0;
+    data[5] = 5.0;
+    data[6] = 1.0;
+    data[7] = 4.0;
+    data[8] = 3.0;
+
+    // Calculate the determinant using the matrix_det function
+    matrix_lup *lu = matrix_lup_solve(mat);
+    double determinant = matrix_det(lu);
+
+    // The determinant of the 3x3 matrix [2 0 1; 3 2 5; 1 4 3] can be calculated manually
+    // as 2 * (2*3 - 5*4) - 0 + 1 * (3*4 - 2*1) = 6 - 0 + 10 = 16
+    cr_assert_float_eq(determinant, -18.0, 1e-6, "Determinant of 3x3 matrix is incorrect");
+
+    // Free resources
+    matrix_lup_free(lu);
+    matrix_free(mat);
+}

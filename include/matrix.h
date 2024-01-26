@@ -101,7 +101,7 @@ matrix *matrix_ls_solve(matrix_lup *lu, matrix *b);
 
 matrix *matrix_inv(matrix *mat);
 
-
+double matrix_det(matrix_lup *lup);
 
 #endif //MATRIX_H
 

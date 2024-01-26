@@ -508,7 +508,19 @@ void matrix_swap_cols(matrix *mat, unsigned int col1, unsigned int col2) {
 
 }
 
+double matrix_trace(matrix *mat) {
+    double trace = 0.0;
+    
+    if(!mat || !mat->data || mat->num_rows != mat->num_cols) {
+        return trace;
+    }
 
+    for (unsigned int i = 0; i < mat->num_rows; i++) {
+        trace += *((double*)mat->data + i * mat->num_cols + i);
+    }
+
+    return trace;
+}
 
 matrix *matrix_add(const matrix *mat1, const matrix *mat2) {
     // Check if both matrices have the same dimensions

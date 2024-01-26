@@ -70,6 +70,8 @@ void matrix_swap_cols(matrix *mat, unsigned int col1, unsigned int col2);
 
 /*******   Matrix math operations   *******/
 
+double matrix_trace(matrix *mat);
+
 //multiply a row with a scalar
 void matrix_row_mult_r(matrix *mat, unsigned int row, double value);
 
@@ -98,6 +100,8 @@ matrix *matrix_ls_solvebck(matrix *U, matrix *b);
 matrix *matrix_ls_solve(matrix_lup *lu, matrix *b);
 
 matrix *matrix_inv(matrix *mat);
+
+
 
 #endif //MATRIX_H
 

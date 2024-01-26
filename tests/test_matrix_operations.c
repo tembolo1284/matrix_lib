@@ -387,3 +387,44 @@ Test(matrix_operations, inverse_2x2_matrix) {
     matrix_free(inverse);
     matrix_free(inv_check);
 }
+
+Test(matrix_operations, trace_2x2_matrix) {
+    unsigned int rows = 2, cols = 2;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+
+    // Initialize a 2x2 matrix with values
+    double values[4] = {1.0, 2.0, 3.0, 4.0};
+    memcpy(mat->data, values, 4 * sizeof(double));
+
+    // Calculate the trace of the matrix
+    double trace = matrix_trace(mat);
+
+    // The trace of a 2x2 matrix is the sum of its diagonal elements
+    double expected_trace = 1.0 + 4.0;
+
+    // Assert that the calculated trace matches the expected value
+    cr_assert_eq(trace, expected_trace, "Trace of the 2x2 matrix is incorrect");
+
+    matrix_free(mat);
+}
+
+Test(matrix_operations, trace_3x3_matrix) {
+    unsigned int rows = 3, cols = 3;
+    matrix *mat = matrix_new(rows, cols, sizeof(double));
+
+    // Initialize a 3x3 matrix with values
+    double values[9] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+    memcpy(mat->data, values, 9 * sizeof(double));
+
+    // Calculate the trace of the matrix
+    double trace = matrix_trace(mat);
+
+    // The trace of a 3x3 matrix is the sum of its diagonal elements
+    double expected_trace = 1.0 + 5.0 + 9.0;
+
+    // Assert that the calculated trace matches the expected value
+    cr_assert_eq(trace, expected_trace, "Trace of the 3x3 matrix is incorrect");
+
+    matrix_free(mat);
+}
+

@@ -362,6 +362,28 @@ Test(matrix_operations, swap_cols_rectangular_matrix) {
 
 }
 
+Test(matrix_operations, inverse_2x2_matrix) {
+    // Create a 2x2 matrix
+    matrix *mat = matrix_new(2, 2, sizeof(double));
 
+    // Initialize the matrix with values for a simple test case
+    double values[4] = {2.0, 1.0, 1.0, 3.0};
+    memcpy(mat->data, values, 4 * sizeof(double));
 
+    // Calculate the inverse of the matrix
+    matrix *inverse = matrix_inv(mat);
 
+    // Define the expected inverse matrix values
+    matrix *inv_check = matrix_new(2, 2, sizeof(double));
+    double expected_values[4] = {0.6, -0.2, -0.2, 0.4};
+    memcpy(inv_check->data, expected_values, 4 * sizeof(double));
+
+    // Verify that the inverse matrix is computed correctly
+    cr_assert_not_null(inverse, "Matrix inversion returned NULL");
+    cr_assert(matrix_eq(inverse, inv_check, 0.001), "Inverse matrix is incorrect");
+
+    // Free the matrices
+    matrix_free(mat);
+    matrix_free(inverse);
+    matrix_free(inv_check);
+}

@@ -181,11 +181,8 @@ int main() {
 
     matrix *mat7 = matrix_subtract(mat6, mat5);
     printf("Mat7 should be last matrix minus matrix above last one.\n");
-    matrix_print(mat7);
+    matrix_print(mat7); 
   
-
-
-    
     matrix *mat8 = matrix_row_rem(mat7, 2);
     matrix_print(mat8);
 
@@ -230,6 +227,35 @@ int main() {
 
     matrix_lup_free(lup);
     matrix_free(mat9);
+
+    matrix *A = matrix_new(2, 2, sizeof(double));
+    matrix *b = matrix_new(2, 1, sizeof(double));
+    double *data_A = (double *)A->data;    
+    double *data_b = (double *)b->data;
+
+    for (unsigned int i = 0; i < 4; i++) {
+        data_A[i] = i + 1.0;
+    }
+
+    data_b[0] = 2.0;
+    data_b[1] = 3.0;
+
+    printf("Matrix A is:\n");
+    matrix_print(A);
+    printf("Matrix b is:\n");
+    matrix_print(b);
+
+    matrix_lup *lu = matrix_lup_solve(A);
+    matrix *x = matrix_ls_solve(lu, b);
+
+    printf("Solution matrix x is:\n");
+    matrix_print(x);
+
+    matrix_free(A);
+    matrix_free(b);
+    matrix_free(x);
+    matrix_lup_free(lu);
+
     return 0;
 }
 

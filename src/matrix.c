@@ -814,3 +814,48 @@ matrix *matrix_ls_solve(matrix_lup *lu, matrix *b) {
 }
 
 
+matrix *matrix_inv(matrix *mat) {
+    if (!mat->is_square) {
+        fprintf(stderr, "Matrix must be square for inversion.\n");
+        return NULL;
+    }
+
+    // Perform LU decomposition
+    matrix_lup *lu = matrix_lup_solve(mat);
+
+    if (!lu) {
+        fprintf(stderr, "LU decomposition failed. The matrix might be singular.\n");
+        return NULL;
+    }
+
+    // Create an identity matrix of the same size as the input matrix
+    double identity_element = 1.0;
+    matrix *identity = matrix_eye(mat->num_rows, sizeof(double), &identity_element);
+
+    // Initialize the inverse matrix
+    matrix *inverse = matrix_new(mat->num_rows, mat->num_cols, sizeof(double));
+
+    // Solve for the inverse by applying LU decomposition to each column of the identity matrix
+    Range all_rows = {-1, -1};
+    for (unsigned int col = 0; col < mat->num_cols; col++) {
+        Range col_range = {col, col + 1};
+        matrix *b = matrix_slice(identity, all_rows, col_range);  // Take single col from identity matrix
+        matrix *x = matrix_ls_solve(lu, b);  // Solve for the column of the inverse
+
+        // Copy the solution (x) to the corresponding column of the inverse matrix
+        for (unsigned int row = 0; row < mat->num_rows; row++) {
+            matrix_set(inverse, row, col, matrix_at(x, row, 0));
+        }
+
+        // Free the temporary matrices
+        matrix_free(b);
+        matrix_free(x);
+    }
+
+    // Free the LU decomposition and intermediate matrices
+    matrix_lup_free(lu);
+    matrix_free(identity);
+
+    return inverse;
+}
+

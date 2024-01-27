@@ -29,7 +29,7 @@ DEPFILES=$(patsubst %.c,%.d,$(CFILES))
 all: $(BINARY)
 
 $(BINARY): $(OBJECTS)
-	$(CC) -o $@ $^ -lgcov
+	$(CC) -o $@ $^ -lgcov -lm
 
 # only want the .c file dependency here, thus $< instead of $^.
 
@@ -62,7 +62,7 @@ diff:
 
 $(TEST)/bin/%: $(TEST)/%.c src/matrix.c
 	mkdir -p $(TEST)/bin
-	$(CC) $(CFLAGS) -o $@ $^ -lcriterion --coverage
+	$(CC) $(CFLAGS) -o $@ $^ -lcriterion --coverage -lm
 
 test: $(TESTBINS)
 	for test in $(TESTBINS) ; do ./$$test ; done

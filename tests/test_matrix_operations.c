@@ -118,6 +118,60 @@ Test(matrix_operations, eq_outside_tolerance) {
     matrix_free(mat2);
 }
 
+Test(matrix_operations, is_symmetric_4x4) {
+    unsigned int rows = 4, cols = 4;
+    matrix *symmetric_mat = matrix_new(rows, cols, sizeof(double));
+
+    // Initialize a symmetric matrix
+    double symmetric_data[16] = {
+        1.0, 2.0, 3.0, 4.0,
+        2.0, 5.0, 6.0, 7.0,
+        3.0, 6.0, 8.0, 9.0,
+        4.0, 7.0, 9.0, 10.0
+    };
+    memcpy(symmetric_mat->data, symmetric_data, 16 * sizeof(double));
+
+    cr_assert(matrix_is_symmetric(symmetric_mat), "Symmetric matrix check failed");
+
+    matrix_free(symmetric_mat);
+}
+
+Test(matrix_operations, is_not_symmetric_4x4) {
+    unsigned int rows = 4, cols = 4;
+    matrix *non_symmetric_mat = matrix_new(rows, cols, sizeof(double));
+
+    // Initialize a non-symmetric matrix
+    double non_symmetric_data[16] = {
+        1.0, 2.0, 3.0, 4.0,
+        5.0, 6.0, 7.0, 8.0,
+        9.0, 10.0, 11.0, 12.0,
+        13.0, 14.0, 15.0, 16.0
+    };
+    memcpy(non_symmetric_mat->data, non_symmetric_data, 16 * sizeof(double));
+
+    cr_assert_not(matrix_is_symmetric(non_symmetric_mat), "Non-symmetric matrix check failed");
+
+    matrix_free(non_symmetric_mat);
+}
+
+Test(matrix_operations, is_posdef_positive) {
+    unsigned int rows = 3, cols = 3;
+    matrix *posdef_mat = matrix_new(rows, cols, sizeof(double));
+
+    // Initialize a positive definite matrix
+    double posdef_data[9] = {
+        4.0, 2.0, 1.0,
+        2.0, 5.0, 2.0,
+        1.0, 2.0, 6.0
+    };
+    memcpy(posdef_mat->data, posdef_data, 9 * sizeof(double));
+   
+    cr_assert(matrix_is_posdef(posdef_mat), "Positive definite matrix check failed");
+
+    matrix_free(posdef_mat);
+}
+
+
 // Test for matrix_slice function for a single row
 Test(matrix_operations, slice_single_row) {
     unsigned int rows = 3, cols = 4;
@@ -425,6 +479,44 @@ Test(matrix_operations, trace_3x3_matrix) {
     // Assert that the calculated trace matches the expected value
     cr_assert_eq(trace, expected_trace, "Trace of the 3x3 matrix is incorrect");
 
+    matrix_free(mat);
+}
+
+Test(matrix_operations, cholesky_decomposition) {
+    // Create a 3x3 symmetric positive-definite matrix
+    unsigned int num_rows = 3;
+    unsigned int num_cols = 3;
+    size_t element_size = sizeof(double);
+    matrix *mat = matrix_new(num_rows, num_cols, element_size);
+
+    // Fill the matrix with values (must be symmetric and positive-definite)
+    double *data = (double *)mat->data;
+    data[0] = 9.0;
+    data[1] = 3.0;
+    data[2] = 6.0;
+    data[3] = 3.0;
+    data[4] = 5.0;
+    data[5] = 4.0;
+    data[6] = 6.0;
+    data[7] = 4.0;
+    data[8] = 9.0;
+
+    // Perform Cholesky decomposition
+    matrix_lup *cholesky = matrix_cholesky_solve(mat);
+
+    // Check if Cholesky decomposition succeeded
+    cr_assert_not_null(cholesky, "Cholesky decomposition failed for a valid matrix");
+
+    // Check if the resulting matrix L is lower triangular
+    matrix *L = cholesky->L;
+    for (unsigned int i = 0; i < L->num_rows; i++) {
+        for (unsigned int j = i + 1; j < L->num_cols; j++) {
+            cr_assert_eq(matrix_at(L, i, j), 0.0, "Non-zero element in the upper triangle of L");
+        }
+    }
+
+    // Clean up memory
+    matrix_lup_free(cholesky);
     matrix_free(mat);
 }
 

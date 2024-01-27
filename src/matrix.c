@@ -142,6 +142,41 @@ double matrix_at(const matrix *mat, unsigned int i, unsigned int j) {
         return ((double*)mat->data)[i * mat->num_cols + j];
 }
 
+bool matrix_is_symmetric(matrix *mat){
+    if(!mat->is_square) {
+        return false; // Non-square matrices are not symmetric
+    }
+
+    for (unsigned int i = 0; i < mat->num_rows; i++) {
+        for(unsigned int j = 0; j < mat->num_cols; j++) {
+
+            if(matrix_at(mat, i, j) != matrix_at(mat, j, i)) {
+                return false; // Elements are not equal across diag, so matrix is not symmetric
+            }
+        }
+    }
+    return true; // All elements are equal when mirrored, mat is symmetric!
+}
+
+
+bool matrix_is_posdef(matrix *mat) {
+    // Check if all leading principal minors (determinants of submatrices) are positive
+    unsigned int n = mat->num_rows;
+    matrix_lup *lup = matrix_lup_solve(mat);
+    double determinant = 1.0;
+
+    for (unsigned int i = 0; i < n; i++) {
+        determinant *= matrix_at(lup->U, i, i);
+        if (determinant <= 0) {
+            matrix_lup_free(lup);
+            return false;
+        }
+    }
+
+    matrix_lup_free(lup);
+    return true;
+}
+
 
 matrix *matrix_slice(matrix *mat, Range row_range, Range col_range) {
     // Check if all rows are needed
@@ -881,10 +916,54 @@ double matrix_det(matrix_lup *lup) {
     for(k = 0; k < (int)(U->num_rows); k++) {
         product *= matrix_at(U, k, k);
     }
-
     return product * sign;
 
 }
 
+// Function to perform Cholesky decomposition
+matrix_lup *matrix_cholesky_solve(matrix *mat) {
+    // Check if the input matrix is square and symmetric
+    if (!mat->is_square || !matrix_is_symmetric(mat)) {
+        fprintf(stderr, "Matrix must be square and symmetric for Cholesky decomposition.\n");
+        return NULL;
+    }
 
+    unsigned int n = mat->num_rows;
+    matrix *L = matrix_new(n, n, sizeof(double));
 
+    for (unsigned int i = 0; i < n; i++) {
+        for (unsigned int j = 0; j <= i; j++) {
+            double sum = 0.0;
+            if (j == i) {
+                for (unsigned int k = 0; k < j; k++) {
+                    double L_kk = matrix_at(L, j, k);
+                    sum += L_kk * L_kk;
+                }
+                double L_ii = sqrt(matrix_at(mat, i, i) - sum);
+                matrix_set(L, i, i, L_ii);
+            } else {
+                for (unsigned int k = 0; k < j; k++) {
+                    sum += matrix_at(L, i, k) * matrix_at(L, j, k);
+                }
+                double L_ij = (matrix_at(mat, i, j) - sum) / matrix_at(L, j, j);
+                matrix_set(L, i, j, L_ij);
+            }
+        }
+    }
+
+    matrix_lup *cholesky = (matrix_lup *)malloc(sizeof(matrix_lup));
+    cholesky->L = L;
+    cholesky->U = NULL; // Cholesky decomposition only requires L
+    cholesky->P = NULL; // No permutation matrix for Cholesky
+    cholesky->num_permutations = 0;
+
+    return cholesky;
+}
+
+// Function to free memory allocated for Cholesky decomposition
+void matrix_cholesky_free(matrix_lup *cholesky) {
+    if (cholesky) {
+        matrix_free(cholesky->L);
+        free(cholesky);
+    }
+}

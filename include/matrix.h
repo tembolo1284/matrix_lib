@@ -23,6 +23,12 @@ typedef struct {
 
 } matrix_lup;
 
+typedef struct {
+  matrix *L;
+  unsigned int num_permutations;
+} matrix_cholesky;
+
+
 /******* Matrix Initialization Operations *******/
 matrix *matrix_new(unsigned int num_rows, unsigned int num_cols, size_t element_size);
 
@@ -41,6 +47,8 @@ void matrix_printf(const matrix *matrix, const char *d_fmt);
 
 int matrix_eqdim(const matrix *m1, const matrix *m2);
 int matrix_eq(const matrix *m1, const matrix *m2, double tolerance);
+bool matrix_is_symmetric(matrix *mat);
+bool matrix_is_posdef(matrix *mat);
 
 matrix *matrix_col_get(const matrix *mat, unsigned int col_num);
 matrix *matrix_row_get(const matrix *mat, unsigned int row_num);
@@ -102,6 +110,9 @@ matrix *matrix_ls_solve(matrix_lup *lu, matrix *b);
 matrix *matrix_inv(matrix *mat);
 
 double matrix_det(matrix_lup *lup);
+
+matrix_lup *matrix_cholesky_solve(matrix *mat);
+void matrix_cholesky_free(matrix_lup *cholesky);
 
 #endif //MATRIX_H
 

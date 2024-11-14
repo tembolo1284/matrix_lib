@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <stdint.h>
 
 double matrix_rand_interval(double min, double max) {
     double d = (double) rand() / ((double) RAND_MAX + 1);
@@ -10,23 +11,47 @@ double matrix_rand_interval(double min, double max) {
 }
 
 matrix *matrix_new(unsigned int num_rows, unsigned int num_cols, size_t element_size) {
+    // Check for zero dimensions
+    if (num_rows == 0 || num_cols == 0) {
+        return NULL;
+    }
 
-  matrix *mat = calloc(1, sizeof(matrix));
-  if (!mat) {
-    return NULL;
-  }
+    // Calculate total elements and check for overflow
+    size_t total_elements;
+    if (__builtin_mul_overflow(num_rows, num_cols, &total_elements)) {
+        return NULL;
+    }
 
-  mat->num_rows = num_rows;
-  mat->num_cols = num_cols;
-  mat->is_square = (num_rows == num_cols);
+    // Check if total allocation size would overflow
+    size_t total_size;
+    if (__builtin_mul_overflow(total_elements, element_size, &total_size)) {
+        return NULL;
+    }
 
-  mat->data = calloc(num_rows * num_cols, element_size);
-  if (!mat->data) {
-    free(mat);
-    return NULL;
-  }
+    // Check if allocation is too large (arbitrary limit to prevent excessive memory usage)
+    const size_t MAX_ALLOCATION = 1024 * 1024 * 1024; // 1GB limit
+    if (total_size > MAX_ALLOCATION) {
+        return NULL;
+    }
 
-  return mat;
+    // Allocate matrix struct
+    matrix *mat = calloc(1, sizeof(matrix));
+    if (!mat) {
+        return NULL;
+    }
+
+    // Allocate data array
+    mat->data = calloc(total_elements, element_size);
+    if (!mat->data) {
+        free(mat);
+        return NULL;
+    }
+
+    mat->num_rows = num_rows;
+    mat->num_cols = num_cols;
+    mat->is_square = (num_rows == num_cols);
+
+    return mat;
 }
 
 matrix *matrix_rand(unsigned int num_rows, 
@@ -40,8 +65,8 @@ matrix *matrix_rand(unsigned int num_rows,
     }
 
     double *data = (double *)r->data; // Cast to double* for direct access
-    for (int i = 0; i < (int)num_rows; i++) {
-        for (int j = 0; j < (int)num_cols; j++) {
+    for (unsigned int i = 0; i < num_rows; i++) {
+        for (unsigned int j = 0; j < num_cols; j++) {
             data[i * num_cols + j] = matrix_rand_interval(min, max);
         }
     }
@@ -50,13 +75,7 @@ matrix *matrix_rand(unsigned int num_rows,
 
 
 matrix *matrix_sqr(unsigned int size, size_t element_size) {
-  matrix *r = matrix_new(size, size, element_size);
-  if (!r) {
-    return NULL;
-  }
-
-  memset(r->data, 0, size * size * element_size);
-  return r;
+  return matrix_new(size, size, element_size);  
 }
 
 matrix *matrix_eye(unsigned int size, size_t element_size, const void *identity_element) {
@@ -91,27 +110,32 @@ void matrix_print(const matrix *matrix) {
 }
 
 void matrix_printf(const matrix *matrix, const char *d_fmt) {
-
-  int i, j;
-  fprintf(stdout, "\n");
-  
-  for(i = 0; i <(int)(matrix->num_rows); ++i) {
-    for(j = 0; j < (int)(matrix->num_cols); ++j) {
-      double value = ((double *)(matrix->data))[i * matrix->num_cols + j];
-      fprintf(stdout, d_fmt, value); 
+    if (!matrix || !matrix->data) {
+        fprintf(stderr, "Cannot print NULL matrix or matrix with NULL data\n");
+        return;
     }
+
     fprintf(stdout, "\n");
-  }
-  
-  fprintf(stdout, "\n");
+    
+    for(unsigned int i = 0; i < matrix->num_rows; ++i) {
+        for(unsigned int j = 0; j < matrix->num_cols; ++j) {
+            double value = ((double *)(matrix->data))[i * matrix->num_cols + j];
+            fprintf(stdout, d_fmt, value); 
+        }
+        fprintf(stdout, "\n");
+    }
+    
+    fprintf(stdout, "\n");
 }
 
-
 int matrix_eqdim(const matrix *m1, const matrix *m2) {
-    return (m1->num_cols == m2->num_cols) && (m1->num_rows == m2->num_rows);
+  if(!m1 || !m2) return 0;  
+  return (m1->num_cols == m2->num_cols) && (m1->num_rows == m2->num_rows);
 }
 
 int matrix_eq(const matrix *m1, const matrix *m2, double tolerance) {
+    if (!m1 || !m2) return 0;
+
     if (!matrix_eqdim(m1, m2)) {
         printf("Matrices are not the same dimension!\n"); 
         return 0;
@@ -135,15 +159,15 @@ int matrix_eq(const matrix *m1, const matrix *m2, double tolerance) {
 }
 
 double matrix_at(const matrix *mat, unsigned int i, unsigned int j) {
-    if (i >= mat->num_rows || j >= mat->num_cols) {
-        fprintf(stderr, "Index out of bounds\n");
+    if (!mat || !mat->data || i >= mat->num_rows || j >= mat->num_cols) {
+        fprintf(stderr, "Ivalid matrix access\n");
         exit(EXIT_FAILURE);
     }
         return ((double*)mat->data)[i * mat->num_cols + j];
 }
 
 bool matrix_is_symmetric(matrix *mat){
-    if(!mat->is_square) {
+    if(!mat || !mat->data || !mat->is_square) {
         return false; // Non-square matrices are not symmetric
     }
 

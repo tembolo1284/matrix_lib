@@ -1,6 +1,8 @@
 #include <criterion/criterion.h>
 #include <criterion/logging.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <limits.h>
 #include "../include/matrix.h"  
 
 // Test case for matrix allocation
@@ -156,19 +158,29 @@ Test(matrix_init, random_values_within_range) {
 }
 
 Test(matrix_init, invalid_allocation) {
-    // Test case for when allocation fails (out of memory)
-    unsigned int num_rows = 1000000; // An unrealistically large number
-    unsigned int num_cols = 1000000;
+    // Test 1: Moderately large allocation that should fail
+    unsigned int num_rows = 50000;
+    unsigned int num_cols = 50000;
     double min = 0.0;
     double max = 1.0;
     size_t element_size = sizeof(double);
 
+    // This should fail as it would require ~20GB of memory
     matrix *result = matrix_rand(num_rows, num_cols, min, max, element_size);
+    cr_assert_null(result, "matrix_rand() should return NULL for large allocation (20GB)");
 
-    // Check if the function returns NULL when allocation fails
-    cr_assert_null(result, "matrix_rand() did not return NULL for invalid allocation");
+    // Test 2: Even larger allocation
+    num_rows = 100000;
+    num_cols = 100000;
+    result = matrix_rand(num_rows, num_cols, min, max, element_size);
+    cr_assert_null(result, "matrix_rand() should return NULL for very large allocation (80GB)");
+
+    // Test 3: Allocation that would cause integer overflow
+    num_rows = UINT_MAX;
+    num_cols = 2;
+    result = matrix_rand(num_rows, num_cols, min, max, element_size);
+    cr_assert_null(result, "matrix_rand() should return NULL for allocation that would overflow");
 }
-
 
 Test(matrix_init, square_matrix) {
     unsigned int size = 4;

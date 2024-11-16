@@ -1,0 +1,5 @@
+# ninja log v5
+1	43	1731717875583524854	CMakeFiles/matrix_main.dir/main.c.o	5a480e6db899087d
+0	84	1731717875624525453	CMakeFiles/matrix.dir/src/matrix.c.o	b66e26adf400e00b
+84	122	1731717875661525994	libmatrix.a	fc997c4ee62c33ae
+122	150	1731717875689526403	matrix_main	68f33e344132b36d

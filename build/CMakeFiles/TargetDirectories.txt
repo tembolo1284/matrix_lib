@@ -1,0 +1,4 @@
+/home/tembolo381/Desktop/c-workspace/neural_matrix/matrix_lib/build/CMakeFiles/matrix.dir
+/home/tembolo381/Desktop/c-workspace/neural_matrix/matrix_lib/build/CMakeFiles/matrix_main.dir
+/home/tembolo381/Desktop/c-workspace/neural_matrix/matrix_lib/build/CMakeFiles/edit_cache.dir
+/home/tembolo381/Desktop/c-workspace/neural_matrix/matrix_lib/build/CMakeFiles/rebuild_cache.dir

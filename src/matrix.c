@@ -160,7 +160,8 @@ int matrix_eq(const matrix *m1, const matrix *m2, double tolerance) {
 
 double matrix_at(const matrix *mat, unsigned int i, unsigned int j) {
     if (!mat || !mat->data || i >= mat->num_rows || j >= mat->num_cols) {
-        fprintf(stderr, "Ivalid matrix access\n");
+        fprintf(stderr, "Invalid matrix access: matrix=%p, data=%p, i=%u, j=%u, num_rows=%u, num_cols=%u\n",
+               (void*) mat, (void*)mat->data, i, j, mat->num_rows, mat->num_cols);
         exit(EXIT_FAILURE);
     }
         return ((double*)mat->data)[i * mat->num_cols + j];
